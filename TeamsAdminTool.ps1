@@ -8,284 +8,642 @@ function LoadMainWindow {
     )
 
     # Declare Objects
-    $script:mainWindow = @{}
+    $script:mainWindow = @{ }
 
     # Load XAML
     [xml]$xaml = @"
     <Window
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    x:Name="MainWindow"
-    Title="TeamsAdminTool" Width="1000" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize" 
->
-<StackPanel>
-    <TabControl x:Name="mainTabControl" Margin="3">
-        <TabItem x:Name="connectTabItem" Header="Connect" Width="100" Height="30">
-            <StackPanel Orientation="Vertical">
-                <GroupBox Header="Azure AD Application" Margin="10,0" HorizontalAlignment="Left" Width="900">
-                    <StackPanel Orientation="Horizontal">
-                        <Label x:Name="clientIdLabel" Content="Application (Client) ID:" HorizontalAlignment="Right"/>
-                        <TextBox x:Name="clientIdTextBox" Margin="4" Width="270" HorizontalAlignment="Left" Text=""/>
-                        <Label x:Name="tenantIdLabel" Content="Directory (Tenant) ID:" HorizontalAlignment="Right"/>
-                        <TextBox x:Name="tenantIdTextBox" Margin="4" Width="270" HorizontalAlignment="Left" Text=""/>
-                    </StackPanel>
-                </GroupBox>
-                <GroupBox Header="Graph API Permissions" Margin="10,0" HorizontalAlignment="Left" Width="900">
-                    <StackPanel Orientation="Horizontal">
-                        <StackPanel Orientation="Vertical" Margin="10">
-                            <RadioButton x:Name="applicationPermissionsRadioButton" Content="Application Permissions" GroupName="Permissions" IsChecked="True"/>
-                            <StackPanel Orientation="Vertical">
-                                <StackPanel Orientation="Horizontal">
-                                    <Label x:Name="clientSecretLabel" Content="Secret:"/>
-                                    <PasswordBox x:Name="clientSecretPasswordBox" Margin="4" Width="270" />
-                                </StackPanel>
-                            </StackPanel>
-                        </StackPanel>
-                        <StackPanel Orientation="Vertical" Margin="10">
-                            <RadioButton x:Name="userPermissionsRadioButton" Content="(Delegated) User Permissions" GroupName="Permissions"/>
-                            <StackPanel Orientation="Horizontal">
-                                <Label x:Name="redirectUriLabel" Content="Redirect URI:"/>
-                                <TextBox x:Name="redirectUriTextBox" Margin="4" Width="400" Text="https://login.microsoftonline.com/common/oauth2/nativeclient" />
-                            </StackPanel>
-                        </StackPanel>
-                    </StackPanel>
-                </GroupBox>
-                <Button x:Name="connectButton" Content="Connect to Graph" Margin="15" Width="120" Height="20" HorizontalAlignment="Left"/>
-            </StackPanel>
-        </TabItem>
-        <TabItem x:Name="teamsTabItem" Header="Teams" IsEnabled="False" Width="100" Height="30">
-            <StackPanel Orientation="Horizontal">
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Name="MainWindow"
+        Title="TeamsAdminTool" Width="1200" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize" FontSize="13.5" 
+    >
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#6264A7" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="MinWidth" Value="100" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="3" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#464775" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#33344A" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#BDBDBD" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Foreground" Value="#252424" />
+            <Setter Property="BorderBrush" Value="#DFDEDE" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border CornerRadius="3" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                        >
+                            <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#6264A7" />
+                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type PasswordBox}">
+            <Setter Property="Foreground" Value="#252424" />
+            <Setter Property="BorderBrush" Value="#DFDEDE" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type PasswordBox}">
+                        <Border CornerRadius="3" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                        >
+                            <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#6264A7" />
+                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Foreground" Value="#252424" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#E2E2F6" />
+                                <Setter Property="Foreground" Value="#252424" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#6264A7" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type ListBox}">
+            <Setter Property="Foreground" Value="#252424" />
+            <Setter Property="Padding" Value="0,5" />
+            <Setter Property="BorderBrush" Value="#DFDEDE" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBox}">
+                        <Border CornerRadius="3" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                Background="{TemplateBinding Background}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer Margin="0" Focusable="false">
+                                <StackPanel IsItemsHost="True" />
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type RadioButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Grid Height="20" Width="20">
+                                    <Border Name="Outer" Background="Transparent" BorderBrush="#DFDEDE" BorderThickness="2" CornerRadius="3" />
+                                    <Border Name="Mark" CornerRadius="2" Margin="5" Visibility="Hidden" />
+                                </Grid>
+                            </BulletDecorator.Bullet>
+                            <TextBlock Margin="5,0" Foreground="#252424" VerticalAlignment="Center">
+                            <ContentPresenter />
+                            </TextBlock>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Mark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="Outer" Property="BorderBrush" Value="#E2E2F6" />
+                                <Setter TargetName="Mark" Property="Background" Value="#E2E2F6" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Mark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="Outer" Property="BorderBrush" Value="#6264A7" />
+                                <Setter TargetName="Mark" Property="Background" Value="#6264A7" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Outer" Property="BorderBrush" Value="#DFDEDE" />
+                                <Setter TargetName="Mark" Property="Background" Value="#DFDEDE" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Grid Height="24" Width="24">
+                                    <Border Name="Outer" Background="Transparent" BorderBrush="#DFDEDE" BorderThickness="2" CornerRadius="3" Margin="2"/>
+                                    <Border Name="CheckMark" Visibility="Hidden" >
+                                        <Path
+                                        x:Name="CheckMarkPath"
+                                        Width="24" Height="24"
+                                        SnapsToDevicePixels="False"
+                                        StrokeThickness="2"
+                                        Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                                    </Border>
+                                </Grid>
+                            </BulletDecorator.Bullet>
+                            <TextBlock Margin="5,0" Foreground="#252424" VerticalAlignment="Center">
+                            <ContentPresenter />
+                            </TextBlock>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#E2E2F6" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#6264A7" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#DFDEDE" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0">
+                                <Label Foreground="#252424"
+                                       FontSize="16">
+                                    <ContentPresenter ContentSource="Header"/>
+                                </Label>
+                            </Border>
+                            <Border Grid.Row="1"
+                            BorderThickness="2"
+                            BorderBrush="#DFDEDE"
+                            CornerRadius="3"
+                            >
+                                <ContentPresenter />
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <StackPanel>
+        <TabControl x:Name="mainTabControl" Margin="3" BorderBrush="{x:Null}" >
+            <TabItem x:Name="connectTabItem" Header="Connect" Width="100" Height="30">
                 <StackPanel Orientation="Vertical" Margin="10">
-                    <StackPanel Orientation="Horizontal">
-                        <Button x:Name="teamsRefreshButton" Content="Refresh Teams" Width="90" Height="30" HorizontalAlignment="Left" Margin="5"/>
-                        <Button x:Name="createTeamButton" Content="Create Team" Width="90" Height="30" HorizontalAlignment="Left" Margin="5"/>
+                    <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+                        <TextBlock Text="TeamsAdminTool" FontSize="20" FontWeight="SemiBold" Foreground="#6264A7"/>
+                        <TextBlock Text="https://github.com/leeford/TeamsAdminTool"/>
                     </StackPanel>
-                    <TextBlock x:Name="totalTeamsTextBlock" Text="Teams (0):"/>
-                    <TextBox x:Name="teamsFilterTextBox" Margin="0,5,0,0"/>
-                    <ListBox x:Name="teamsListBox" Width="200" Height="Auto" HorizontalAlignment="Left" MaxHeight="500"/>
-                </StackPanel>
-                <StackPanel Orientation="Vertical" Margin="0,10,10,10">
-                    <StackPanel Orientation="Horizontal">
-                        <Rectangle Height="50" Width="50">
-                            <Rectangle.Fill>
-                                <ImageBrush ImageSource="" />
-                            </Rectangle.Fill>
-                        </Rectangle>
+                    <StackPanel Orientation="Vertical" x:Name="connectionSettingsStackPanel">
+                        <StackPanel Orientation="Vertical" x:Name="sharedAzureADAppStackPanel" Margin="10">
+                            <RadioButton x:Name="useSharedAzureADApplicationRadioButton" Content="Use Shared Azure AD Application"  GroupName="azureADApplication" IsChecked="True"/>
+                            <TextBlock Text="Use shared Azure AD Application (no further setup required)." FontStyle="Italic" />
+                        </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="10">
-                            <TextBlock x:Name="teamDisplayNameTextBlock" FontSize="24" />
-                            <TextBlock x:Name="teamDescriptionTextBlock" FontSize="16" />
+                        <RadioButton x:Name="useCustomAzureADApplicationRadioButton" Content="Use Custom Azure AD Application"  GroupName="azureADApplication" IsChecked="False"/>
+                        <TextBlock Text="Only required if you don't want to use the shared Azure AD Application." FontStyle="Italic" />
+                        <StackPanel Orientation="Vertical" x:Name="customAzureADAppStackPanel" IsEnabled="False">
+                            <GroupBox Header="Azure AD Application" Margin="10,5">
+                                <StackPanel Orientation="Vertical" Margin="5">
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Application (Client) ID:"/>
+                                        <TextBox x:Name="clientIdTextBox" Margin="5,0" Width="400" HorizontalAlignment="Left"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Tenant (Directory) ID:"/>
+                                        <TextBox x:Name="tenantIdTextBox" Margin="5,0" Width="400" HorizontalAlignment="Left"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                            <GroupBox Header="Permission Type" Margin="10,5">
+                                <StackPanel Orientation="Vertical" Margin="5">
+                                    <RadioButton x:Name="applicationPermissionsRadioButton" Content="Application Permissions" GroupName="Permissions"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,10">
+                                        <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Client Secret ID:"/>
+                                        <PasswordBox x:Name="clientSecretPasswordBox" Margin="5,0" Width="400" HorizontalAlignment="Left"/>
+                                    </StackPanel>
+                                        <RadioButton x:Name="userPermissionsRadioButton" Content="(Delegated) User Permissions" GroupName="Permissions" IsChecked="True"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,10">
+                                        <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Redirect URI:"/>
+                                        <TextBox x:Name="redirectUriTextBox" Margin="5,0" Width="400" HorizontalAlignment="Left" Text="https://login.microsoftonline.com/common/oauth2/nativeclient"/>
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </GroupBox>
                         </StackPanel>
                     </StackPanel>
-                    <TabControl x:Name="teamTabControl" Width="750" Height="600" IsEnabled="False">
-                        <TabItem x:Name="teamOverviewTabItem" Header="Overview" Width="100" Height="30">
+                </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button x:Name="connectButton" Content="Connect"/>
+                        <Button x:Name="disconnectButton" Content="Disconnect" IsEnabled="False"/>
+                    </StackPanel>
+
+                </StackPanel>
+            </TabItem>
+            <TabItem x:Name="teamsTabItem" Header="Teams" IsEnabled="False" Width="100" Height="30">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <Button x:Name="teamsRefreshButton" Content="Refresh Teams"/>
+                        <Button x:Name="addTeamButton" Content="Add Team"/>
+                        <Button x:Name="teamsReportButton" Content="Save Report"/>
+                        <TextBlock Text="Report Type:" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="teamsReportTypeComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10,0,10,10">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock x:Name="totalTeamsTextBlock" Text="Teams (0):" FontSize="20" Margin="5,0,0,5"/>
+                            <TextBox x:Name="teamsFilterTextBox"/>
+                            <ListBox x:Name="teamsListBox" Width="220" MaxHeight="735" Margin="4,10"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="10,0,0,0">
                             <StackPanel Orientation="Vertical">
-                                <StackPanel Orientation="Horizontal" Margin="10">
-                                    <StackPanel Orientation="Vertical" Margin="5">
-                                        <TextBlock Text="Visibility:" HorizontalAlignment="Right" />
-                                        <TextBlock Text="Creation Date:" HorizontalAlignment="Right" />
-                                        <TextBlock Text="Expiration Date:" HorizontalAlignment="Right" />
-                                        <TextBlock Text="Mail:" HorizontalAlignment="Right" />
-                                        <TextBlock Text="Archived:" HorizontalAlignment="Right" />
-                                        <TextBlock Text="Members:" HorizontalAlignment="Right" />
-                                        <TextBlock Text="Owners:" HorizontalAlignment="Right" />
-                                        <TextBlock Text="Channels:" HorizontalAlignment="Right" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="5">
-                                        <TextBlock x:Name="teamVisibilityTextBlock" HorizontalAlignment="Left" />
-                                        <TextBlock x:Name="teamCreatedDateTextBlock" HorizontalAlignment="Left" />
-                                        <TextBlock x:Name="teamExpirationDateTextBlock" HorizontalAlignment="Left" />
-                                        <TextBlock x:Name="teamMailTextBlock" HorizontalAlignment="Left" />
-                                        <TextBlock x:Name="teamArchivedTextBlock" HorizontalAlignment="Left" />
-                                        <TextBlock x:Name="totalTeamMembersTextBlock" HorizontalAlignment="Left" />
-                                        <TextBlock x:Name="totalTeamOwnersTextBlock" HorizontalAlignment="Left" />
-                                        <TextBlock x:Name="totalTeamChannelsTextBlock" HorizontalAlignment="Left" />
-                                    </StackPanel>
-                                </StackPanel>
+                                <TextBlock x:Name="teamDisplayNameTextBlock" FontSize="24" FontWeight="SemiBold" />
+                                <TextBlock x:Name="teamDescriptionTextBlock" FontSize="16" />
                             </StackPanel>
-                        </TabItem>
-                        <TabItem x:Name="teamMembersTabItem" Header="Members" Width="100" Height="30">
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <TextBlock x:Name="teamMembersTextBlock" Text="Members (0):"/>
-                                <DataGrid x:Name="teamMembersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="190" SelectionMode="Single" AlternatingRowBackground="#FFE5E5F1" AlternationCount="2" GridLinesVisibility="None">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
-                                        <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
-                                        <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" />
-                                        <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
-                                        <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Button x:Name="addTeamMemberButton" Content="Add Member" Width="120" Height="30" Margin="5"/>
-                                    <Button x:Name="removeTeamMemberButton" Content="Remove Member" Width="120" Height="30" Margin="5"/>
-                                </StackPanel>
-                                <TextBlock x:Name="teamOwnersTextBlock" Text="Owners (0):" Margin="0,5,0,0"/>
-                                <DataGrid x:Name="teamOwnersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="190" SelectionMode="Single" AlternatingRowBackground="#FFE5E5F1" AlternationCount="2" GridLinesVisibility="None">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
-                                        <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
-                                        <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" />
-                                        <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
-                                        <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Button x:Name="addTeamOwnerButton" Content="Add Owner" Width="120" Height="30" Margin="5"/>
-                                    <Button x:Name="removeTeamOwnerButton" Content="Remove Owner" Width="120" Height="30" Margin="5"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </TabItem>
-                        <TabItem x:Name="teamChannelsTabItem" Header="Channels" Width="100" Height="30">
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <StackPanel Orientation="Horizontal">
-                                    <StackPanel Orientation="Vertical">
-                                        <TextBlock x:Name="teamChannelsTextBlock" Text="Channels (0):"/>
-                                        <ListBox x:Name="channelsListBox" Width="150" HorizontalAlignment="Left" MaxHeight="500" Margin="0,10" />
+                            <TabControl x:Name="teamTabControl" Height="750" Width="930" IsEnabled="False" Margin="0,10,0,0">
+                                <TabItem x:Name="teamOverviewTabItem" Header="Overview" Width="100" Height="30">
+                                    <StackPanel Orientation="Vertical"  Margin="10">
+                                        <GroupBox Header="Team Overview">
+                                            <StackPanel Orientation="Vertical">
+                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                    <TextBlock Text="Visbility:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBlock x:Name="teamVisibilityTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                    <TextBlock Text="Creation Date:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBlock x:Name="teamCreatedDateTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                    <TextBlock Text="Expiration Date:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBlock x:Name="teamExpirationDateTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                    <TextBlock Text="Mail:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBlock x:Name="teamMailTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                    <TextBlock Text="Archived:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <CheckBox x:Name="teamArchivedCheckBox" Margin="5,0" IsHitTestVisible="False" Focusable="False" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                    <TextBlock Text="Members:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBlock x:Name="totalTeamMembersTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                    <TextBlock Text="Owners:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBlock x:Name="totalTeamOwnersTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                    <TextBlock Text="Channels:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBlock x:Name="totalTeamChannelsTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </GroupBox>
                                     </StackPanel>
-                                    <StackPanel Orientation="Vertical" Margin="10,0">
-                                        <TextBlock x:Name="channelDisplayNameTextBlock" FontSize="18" />
-                                        <TextBlock x:Name="channelDescriptionTextBlock" FontSize="14" />
-                                        <TabControl x:Name="channelTabControl" Width="565" Height="490" IsEnabled="False" Margin="0,10,0,0">
-                                            <TabItem x:Name="channelOverviewTabItem" Header="Overview" Width="100">
-                                                <StackPanel Orientation="Horizontal" Margin="10">
-                                                    <StackPanel Orientation="Vertical" Margin="5">
-                                                        <TextBlock Text="Mail:" HorizontalAlignment="Right" />
-                                                        <TextBlock Text="Tabs:" HorizontalAlignment="Right" />
-                                                        <TextBlock Text="Is Favourite By Default:" HorizontalAlignment="Right" />
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="5">
-                                                        <TextBlock x:Name="channelMailTextBlock" HorizontalAlignment="Left" />
-                                                        <TextBlock x:Name="totalChannelTabsTextBlock" HorizontalAlignment="Left" />
-                                                        <CheckBox x:Name="channelIsFavouriteByDefault1CheckBox" HorizontalAlignment="Left" />
-                                                    </StackPanel>
-                                                </StackPanel>
-                                            </TabItem>
-                                            <TabItem x:Name="channelTabsTabItem" Header="Tabs" Width="100">
-                                                <StackPanel Orientation="Vertical" Margin="10">
-                                                    <TextBlock x:Name="channelTabsTextBlock" Text="Tabs (0):"/>
-                                                    <ComboBox x:Name="channelTabsComboBox" Width="200" Margin="0,10" HorizontalAlignment="Left"/>
-                                                    <StackPanel Orientation="Horizontal">
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                        <Button x:Name="deleteChannelTabButton" Content="Delete Tab" Width="120" Height="30" Margin="5"/>
-                                                    </StackPanel>
-                                                </StackPanel>
-                                            </TabItem>
-                                            <TabItem x:Name="channelSettingsTabItem" Header="Settings" Width="100">
-                                                <StackPanel Orientation="Vertical" Margin="10">
-                                                    <GroupBox Header="General">
-                                                        <StackPanel Orientation="Horizontal" Margin="10,10">
-                                                            <StackPanel Orientation="Vertical">
-                                                                <Label Content="Channel Name:" HorizontalAlignment="Right"/>
-                                                                <Label Content="Channel Description:" HorizontalAlignment="Right"/>
-                                                                <Label Content="Is Favourite By Default:" HorizontalAlignment="Right"/>
+                                </TabItem>
+                                <TabItem x:Name="teamMembersTabItem" Header="Members" Width="100" Height="30">
+                                    <StackPanel Orientation="Vertical" Margin="10">
+                                        <TextBlock x:Name="teamMembersTextBlock" Text="Members (0):" FontSize="16"/>
+                                        <DataGrid x:Name="teamMembersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="265" SelectionMode="Single">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
+                                                <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
+                                                <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" />
+                                                <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
+                                                <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button x:Name="addTeamMemberButton" Content="Add Member"/>
+                                            <Button x:Name="removeTeamMemberButton" Content="Remove Member"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="teamOwnersTextBlock" Text="Owners (0):" Margin="0,5,0,0" FontSize="16"/>
+                                        <DataGrid x:Name="teamOwnersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="265" SelectionMode="Single">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
+                                                <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
+                                                <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" />
+                                                <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
+                                                <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button x:Name="addTeamOwnerButton" Content="Add Owner"/>
+                                            <Button x:Name="removeTeamOwnerButton" Content="Remove Owner"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </TabItem>
+                                <TabItem x:Name="teamChannelsTabItem" Header="Channels" Width="100" Height="30">
+                                    <StackPanel Orientation="Vertical" x:Name="channelsStackPanel" Margin="10">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock x:Name="teamChannelsTextBlock" Text="Channels (0):" FontSize="16"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,10">
+                                            <ComboBox x:Name="channelsComboBox" MinWidth="150" VerticalAlignment="Center" />
+                                            <Button x:Name="addChannelButton" Content="Add Channel" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <TabControl x:Name="channelTabControl" Height="619" IsEnabled="False" Margin="0,10,0,0">
+                                                <TabItem x:Name="channelOverviewTabItem" Header="Overview" Width="100">
+                                                    <StackPanel Orientation="Vertical" Margin="10">
+                                                        <GroupBox Header="Channel Overview">
+                                                            <StackPanel Orientation="Vertical" Margin="5">
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBlock x:Name="channelDisplayNameTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBlock x:Name="channelDescriptionTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Mail:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBlock x:Name="channelMailTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Tabs:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBlock x:Name="totalChannelTabsTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Favourite By Default:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <CheckBox x:Name="channelIsFavouriteByDefault1CheckBox" Margin="5,0" IsHitTestVisible="False" Focusable="False" VerticalAlignment="Center"/>
+                                                                </StackPanel>
                                                             </StackPanel>
-                                                            <StackPanel Orientation="Vertical" Margin="5,0">
-                                                                <TextBox x:Name="channelDisplayNameTextBox" Width="300" Height="23" Margin="0,1.5"/>
-                                                                <TextBox x:Name="channelDescriptionTextBox" Width="300" Height="23" Margin="0,1.5"/>
-                                                                <CheckBox x:Name="channelIsFavouriteByDefault2CheckBox" MinWidth="100" HorizontalAlignment="Left" Margin="0,5"/>
+                                                        </GroupBox>
+                                                    </StackPanel>
+                                                </TabItem>
+                                                <TabItem x:Name="channelTabsTabItem" Header="Tabs" Width="100">
+                                                    <StackPanel Orientation="Vertical" Margin="10">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock x:Name="channelTabsTextBlock" Text="Tabs (0):" FontSize="16"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal" Margin="0,10">
+                                                            <ComboBox x:Name="channelTabsComboBox" MinWidth="150" VerticalAlignment="Center" />
+                                                            <Button x:Name="addTabButton" Content="Add Tab" VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                        <StackPanel x:Name="tabSettingStackPanel" Orientation="Vertical">
+                                                            <GroupBox Header="Tab Overview" Margin="0,10">
+                                                                <StackPanel Orientation="Vertical" Margin="5">
+                                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                        <TextBlock Text="Name:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                        <TextBox x:Name="tabDisplayNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center"/>
+                                                                    </StackPanel>
+                                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                        <TextBlock Text="App ID:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                        <TextBox x:Name="tabTeamsAppIdTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsReadOnly="True"/>
+                                                                    </StackPanel>
+                                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                        <TextBlock Text="Entity ID:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                        <TextBox x:Name="tabEntityIdTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsReadOnly="True"/>
+                                                                    </StackPanel>
+                                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                        <TextBlock Text="Content URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                        <TextBox x:Name="tabContentUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsReadOnly="True"/>
+                                                                    </StackPanel>
+                                                                    <StackPanel Orientation="Horizontal" Margin="0,2" >
+                                                                        <TextBlock Text="Remove URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                        <TextBox x:Name="tabRemoveUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsReadOnly="True"/>
+                                                                    </StackPanel>
+                                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                        <TextBlock Text="Website URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                        <TextBox x:Name="tabWebsiteUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsReadOnly="True"/>
+                                                                    </StackPanel>
+                                                                </StackPanel>
+                                                            </GroupBox>
+                                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                                <Button x:Name="updateTabButton" Content="Save"/>
+                                                                <Button x:Name="deleteTabButton" Content="Delete"/>
                                                             </StackPanel>
                                                         </StackPanel>
-                                                    </GroupBox>
-                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                                        <Button x:Name="deleteChannelButton" Content="Delete Channel" Width="120" Height="30" Margin="5"/>
-                                                        <Button x:Name="updateChannelButton" Content="Update Channel" Margin="5" Width="120" Height="30"/>
-                                                        <Button x:Name="refreshChannelButton" Content="Refresh" Margin="5" Width="120" Height="30"/>
+                                                    </StackPanel>
+                                                </TabItem>
+                                                <TabItem x:Name="channelSettingsTabItem" Header="Settings" Width="100" VerticalAlignment="Top">
+                                                    <StackPanel Orientation="Vertical" Margin="10">
+                                                        <GroupBox Header="General">
+                                                            <StackPanel Orientation="Vertical" Margin="5">
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBox x:Name="channelDisplayNameTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBox x:Name="channelDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Favourite By Default:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <CheckBox x:Name="channelIsFavouriteByDefault2CheckBox" Margin="5,0" VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </StackPanel>
+                                                        </GroupBox>
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,10">
+                                                            <Button x:Name="updateChannelButton" Content="Save" />
+                                                            <Button x:Name="refreshChannelButton" Content="Refresh" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </TabItem>
+                                                <TabItem x:Name="channelActionsTabItem" Header="Actions" Width="100">
+                                                    <StackPanel Orientation="Vertical" Margin="10" >
+                                                        <StackPanel Orientation="Horizontal" Margin="5">
+                                                            <Button x:Name="deleteChannelButton" Content="Delete" />
+                                                            <TextBlock Text="Delete this Channel" VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </TabItem>
+                                            </TabControl>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </TabItem>
+                                <TabItem x:Name="teamSettingsTabItem" Header="Settings" Width="100" Height="30" >
+                                    <StackPanel Orientation="Vertical" Margin="10">
+                                        <StackPanel x:Name="teamSettingsStackPanel" Orientation="Vertical">
+                                            <GroupBox Header="General">
+                                                <StackPanel Orientation="Vertical" Margin="5">
+                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                        <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                        <TextBox x:Name="teamDisplayNameTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                        <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                        <TextBox x:Name="teamDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                        <TextBlock Text="Privacy:" Width="120" VerticalAlignment="Center" TextAlignment="Right"/>
+                                                        <ComboBox x:Name="teamPrivacyComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
                                                     </StackPanel>
                                                 </StackPanel>
-                                            </TabItem>
-                                        </TabControl>
-                                    </StackPanel>
-                                </StackPanel>
-                            </StackPanel>
-                        </TabItem>
-                        <TabItem x:Name="teamSettingsTabItem" Header="Settings" Width="100" Height="30" >
-                            <StackPanel Orientation="Vertical" Margin="10">
-                                <StackPanel x:Name="teamSettingsStackPanel" Orientation="Vertical">
-                                    <GroupBox Header="General">
-                                        <StackPanel Orientation="Horizontal" Margin="30,10">
-                                            <StackPanel Orientation="Vertical">
-                                                <Label Content="Team Name:" HorizontalAlignment="Right"/>
-                                                <Label Content="Team Description:" HorizontalAlignment="Right"/>
-                                                <Label Content="Privacy:" HorizontalAlignment="Right"/>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Vertical" Margin="5,0">
-                                                <TextBox x:Name="teamDisplayNameTextBox" Width="400" Height="23" Margin="0,1.5"/>
-                                                <TextBox x:Name="teamDescriptionTextBox" Width="400" Height="23" Margin="0,1.5"/>
-                                                <ComboBox x:Name="teamPrivacyComboBox" MinWidth="100" HorizontalAlignment="Left" Margin="0,1.5"/>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </GroupBox>
-                                    <GroupBox Header="Member Settings">
-                                        <StackPanel Orientation="Horizontal" Margin="30,10">
-                                            <StackPanel Orientation="Vertical">
-                                                <CheckBox x:Name="allowCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
-                                                <CheckBox x:Name="allowDeleteChannelsCheckBox" Content="Delete Channels"/>
-                                                <CheckBox x:Name="allowAddRemoveAppsCheckBox" Content="Add/Remove Apps"/>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Vertical" Margin="10,0,0,0">
-                                                <CheckBox x:Name="allowCreateUpdateRemoveTabsCheckBox" Content="Create/Update/Remove Tabs"/>
-                                                <CheckBox x:Name="allowCreateUpdateRemoveConnectorsCheckBox" Content="Create/Update/Remove Connectors"/>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </GroupBox>
-                                    <GroupBox Header="Guest Settings">
-                                        <StackPanel Orientation="Horizontal" Margin="30,10">
-                                            <StackPanel Orientation="Vertical">
-                                                <CheckBox x:Name="allowGuestCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Vertical" Margin="10,0,0,0">
-                                                <CheckBox x:Name="allowGuestDeleteChannelsCheckBox" Content="Delete Channels"/>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </GroupBox>
-                                    <GroupBox Header="Messaging Settings">
-                                        <StackPanel Orientation="Horizontal" Margin="30,10">
-                                            <StackPanel Orientation="Vertical">
-                                                <CheckBox x:Name="allowUserEditMessagesCheckBox" Content="Members Edit Messages"/>
-                                                <CheckBox x:Name="allowUserDeleteMessagesCheckBox" Content="Members Delete Messages"/>
-                                                <CheckBox x:Name="allowOwnerDeleteMessagesCheckBox" Content="Owners Delete Messages"/>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Vertical" Margin="10,0,0,0">
-                                                <CheckBox x:Name="allowTeamMentionsCheckBox" Content="Team Mentions"/>
-                                                <CheckBox x:Name="allowChannelMentionsCheckBox" Content="Channel Mentions"/>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </GroupBox>
-                                    <GroupBox Header="Fun Settings">
-                                        <StackPanel Orientation="Horizontal" Margin="30,10">
-                                            <StackPanel Orientation="Vertical">
-                                                <CheckBox x:Name="allowGiphyCheckBox" Content="Allow Giphy"/>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Label Content="Giphy Rating:"/>
-                                                    <ComboBox x:Name="giphyContentRatingComboBox" MinWidth="100" Margin="5,0,0,0"/>
+                                            </GroupBox>
+                                            <GroupBox Header="Member Settings">
+                                                <StackPanel Orientation="Horizontal" Margin="30,10">
+                                                    <StackPanel Orientation="Vertical" Width="250">
+                                                        <CheckBox x:Name="allowCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
+                                                        <CheckBox x:Name="allowDeleteChannelsCheckBox" Content="Delete Channels"/>
+                                                        <CheckBox x:Name="allowAddRemoveAppsCheckBox" Content="Add/Remove Apps"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                        <CheckBox x:Name="allowCreateUpdateRemoveTabsCheckBox" Content="Create/Update/Remove Tabs"/>
+                                                        <CheckBox x:Name="allowCreateUpdateRemoveConnectorsCheckBox" Content="Create/Update/Remove Connectors"/>
+                                                    </StackPanel>
                                                 </StackPanel>
-                                            </StackPanel>
-                                            <StackPanel Orientation="Vertical" Margin="10,0,0,0">
-                                                <CheckBox x:Name="allowStickersAndMemesCheckBox" Content="Allow Stickers and Memes"/>
-                                                <CheckBox x:Name="allowCustomMemesCheckBox" Content="Allow Custom Memes"/>
-                                            </StackPanel>
+                                            </GroupBox>
+                                            <GroupBox Header="Guest Settings">
+                                                <StackPanel Orientation="Horizontal" Margin="30,10">
+                                                    <StackPanel Orientation="Vertical" Width="250">
+                                                        <CheckBox x:Name="allowGuestCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                        <CheckBox x:Name="allowGuestDeleteChannelsCheckBox" Content="Delete Channels"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </GroupBox>
+                                            <GroupBox Header="Messaging Settings">
+                                                <StackPanel Orientation="Horizontal" Margin="30,10">
+                                                    <StackPanel Orientation="Vertical" Width="250">
+                                                        <CheckBox x:Name="allowUserEditMessagesCheckBox" Content="Members Edit Messages"/>
+                                                        <CheckBox x:Name="allowUserDeleteMessagesCheckBox" Content="Members Delete Messages"/>
+                                                        <CheckBox x:Name="allowOwnerDeleteMessagesCheckBox" Content="Owners Delete Messages"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                        <CheckBox x:Name="allowTeamMentionsCheckBox" Content="Team Mentions"/>
+                                                        <CheckBox x:Name="allowChannelMentionsCheckBox" Content="Channel Mentions"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </GroupBox>
+                                            <GroupBox Header="Fun Settings">
+                                                <StackPanel Orientation="Horizontal" Margin="30,10">
+                                                    <StackPanel Orientation="Vertical" Width="250">
+                                                        <CheckBox x:Name="allowGiphyCheckBox" Content="Allow Giphy"/>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Label Content="Giphy Rating:"/>
+                                                            <ComboBox x:Name="giphyContentRatingComboBox" MinWidth="100" Margin="5,0,0,0"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                        <CheckBox x:Name="allowStickersAndMemesCheckBox" Content="Allow Stickers and Memes"/>
+                                                        <CheckBox x:Name="allowCustomMemesCheckBox" Content="Allow Custom Memes"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </GroupBox>
+
                                         </StackPanel>
-                                    </GroupBox>
-
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                                    <Button x:Name="archiveTeamButton" Content="Archive Team" Width="120" Height="30" Margin="5"/>
-                                    <Button x:Name="unArchiveTeamButton" Content="Un-Archive Team" Width="120" Height="30" Margin="5"/>
-                                    <Button x:Name="deleteTeamButton" Content="Delete Team" Width="120" Height="30" Margin="5"/>
-                                    <Button x:Name="updateTeamButton" Content="Update Team" Width="120" Height="30" Margin="5"/>
-                                    <Button x:Name="refreshTeamButton" Content="Refresh" Width="120" Height="30" Margin="5"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </TabItem>
-                    </TabControl>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,10">
+                                            <Button x:Name="updateTeamButton" Content="Save"/>
+                                            <Button x:Name="refreshTeamButton" Content="Refresh"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </TabItem>
+                                <TabItem x:Name="teamActionsTabItem" Header="Actions" Width="100" Height="30" >
+                                    <StackPanel Orientation="Vertical" Margin="10">
+                                        <StackPanel Orientation="Horizontal" Margin="5">
+                                            <Button x:Name="deleteTeamButton" Content="Delete"/>
+                                            <TextBlock Text="Delete this Team (and group)" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="5">
+                                            <Button x:Name="archiveTeamButton" Content="Archive"/>
+                                            <TextBlock Text="Archive this Team - Team will become read-only" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="5">
+                                            <Button x:Name="unArchiveTeamButton" Content="Un-Archive"/>
+                                            <TextBlock Text="Un-archive this Team - Team will be restored to full functionality" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="5">
+                                            <Button x:Name="cloneTeamButton" Content="Clone"/>
+                                            <TextBlock Text="Clone this Team" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </TabItem>
+                            </TabControl>
+                        </StackPanel>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
-        </TabItem>
-    </TabControl>
-</StackPanel>
+            </TabItem>
+        </TabControl>
+    </StackPanel>
 </Window>
-
 "@
 
     # Feed XAML in to XMLNodeReader
@@ -294,60 +652,90 @@ function LoadMainWindow {
     # Create a Window Object
     $WindowObject = [Windows.Markup.XamlReader]::Load($XMLReader)
 
-    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]")  | ForEach-Object {
+    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object {
 
-        $script:mainWindow.Add($_.Name, $WindowObject.FindName($_.Name))
+        try {
+            $script:mainWindow.Add($_.Name, $WindowObject.FindName($_.Name))
+        }
+        catch {
+
+        }
 
     }
 
 }
+
 function GetAuthToken {
 
     param (
 
     )
 
-    # User permissions checked
-    if ($script:mainWindow.userPermissionsRadioButton.IsChecked -eq $true) {
+    # Reset Auth Token
+    $script:issuedToken = $null
 
-        # Check all required fields are valid
-        ValidateTextBox "clientIdTextBox" "[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}"
-        ValidateTextBox "tenantIdTextBox" "[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}"
-        ValidateTextBox "redirectUriTextBox" "(.+)"
+    # Shared (multitenant) Azure AD App checked
+    if ($script:mainWindow.useSharedAzureADApplicationRadioButton.IsChecked -eq $true) {
+        
+        # Set tenant ID to 'common' as multitenant Azure AD App
+        $script:tenant = [string]"common"
+        $script:clientId = [string]"6d84adaa-2a01-4f45-964b-180cbdbfd20d"
 
-        if ($script:inputs.clientIdTextBox -eq $true -and $script:inputs.tenantIdTextBox -eq $true -and $script:inputs.redirectUriTextBox -eq $true) {
-
-            # Get Issued Token for User
-            $script:issuedToken = GetAuthTokenUser
-
-        }
-        else {
-
-            ErrorPrompt -messageBody "Not all fields populated to request token. Ensure Client ID, Tenant ID and Redirect URI are populated correcty." -messageTitle "Not all fields populated"
-
-        }
-
+        # Get Issued Token for User
+        $script:issuedToken = GetAuthTokenUser
+    
     }
+    # Custom Azure AD App checked
+    elseif ($script:mainWindow.useCustomAzureADApplicationRadioButton.IsChecked -eq $true) {
+        
+        # User permissions checked
+        if ($script:mainWindow.userPermissionsRadioButton.IsChecked -eq $true) {
 
-    # Application permissions selected
-    if ($script:mainWindow.applicationPermissionsRadioButton.IsChecked -eq $true) {
+            # Check all required fields are valid
+            $validClientId = ValidateRegex $script:mainWindow.clientIdTextBox.Text "[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}"
+            $validTenantId = ValidateRegex $script:mainWindow.tenantIdTextBox.Text "[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}"
+            $validRedirectUri = ValidateRegex $script:mainWindow.redirectUriTextBox.Text "(.+)"
 
-        # Check all required fields are valid
-        ValidateTextBox "clientIdTextBox" "[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}"
-        ValidateTextBox "tenantIdTextBox" "[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}"
-        ValidateTextBox "clientSecretPasswordBox" "(.+)"
+            if ($validClientId -eq $true -and $validTenantId -eq $true -and $validRedirectUri -eq $true) {
 
-        if ($script:inputs.clientIdTextBox -eq $true -and $script:inputs.tenantIdTextBox -eq $true -and $script:inputs.clientSecretPasswordBox -eq $true) {
+                # Set tenant and client ID based off valid IDs
+                $script:tenant = [string]$script:mainWindow.tenantIdTextBox.Text
+                $script:clientId = [string]$script:mainWindow.clientIdTextBox.Text
 
-            # Get Issued Token for Application
-            $script:issuedToken = GetAuthTokenApplication
+                # Get Issued Token for User
+                $script:issuedToken = GetAuthTokenUser
+
+            }
+            else {
+
+                ErrorPrompt -messageBody "Not all fields populated to request token. Ensure Client ID, Tenant ID and Redirect URI are populated correcty." -messageTitle "Not all fields populated"
+
+            }
 
         }
-        else {
 
-            ErrorPrompt -messageBody "Not all fields populated to request token. Ensure Client ID, Tenant ID and Client Secret are populated correcty." -messageTitle "Not all fields populated"
+        # Application permissions selected
+        if ($script:mainWindow.applicationPermissionsRadioButton.IsChecked -eq $true) {
 
+            # Check all required fields are valid
+            $validClientId = ValidateRegex $script:mainWindow.clientIdTextBox.Text "[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}"
+            $validTenantId = ValidateRegex $script:mainWindow.tenantIdTextBox.Text "[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}"
+            $validClientSecret = ValidateRegex $script:mainWindow.clientSecretPasswordBox.Password "(.+)"
+
+            if ($validClientId -eq $true -and $validTenantId -eq $true -and $validClientSecret -eq $true) {
+
+                # Get Issued Token for Application
+                $script:issuedToken = GetAuthTokenApplication
+
+            }
+            else {
+
+                ErrorPrompt -messageBody "Not all fields populated to request token. Ensure Client ID, Tenant ID and Client Secret are populated correcty." -messageTitle "Not all fields populated"
+
+            }
+        
         }
+
     }
 
     # If there is an issued token
@@ -365,21 +753,18 @@ function GetAuthCodeUser {
 
     )
 
-    $clientId = [string]$script:mainWindow.clientIdTextBox.Text
-    $tenantId = [string]$script:mainWindow.tenantIdTextBox.Text
-
     # Random State
     $state = Get-Random
 
     # Encode scope to fit inside query string
-    $script:scope = "Group.ReadWrite.All User.ReadWrite.All"
+    $script:scope = "Group.ReadWrite.All User.ReadWrite.All Notes.ReadWrite.All"
     $encodedScope = [System.Web.HttpUtility]::UrlEncode($script:scope)
 
     # Redirect URI (encode it to fit inside query string)
     $redirectUri = [System.Web.HttpUtility]::UrlEncode($script:mainWindow.redirectUriTextBox.Text)
 
     # Construct URI
-    $uri = [uri]"https://login.microsoftonline.com/$tenantId/oauth2/v2.0/authorize?client_id=$clientId&response_type=code&redirect_uri=$redirectUri&response_mode=query&scope=$encodedScope&state=$state&prompt=login"
+    $uri = [uri]"https://login.microsoftonline.com/$script:tenant/oauth2/v2.0/authorize?client_id=$script:clientId&response_type=code&redirect_uri=$redirectUri&response_mode=query&scope=$encodedScope&state=$state&prompt=login"
 
     # Create Window for User Sign-In
     $windowProperty = @{
@@ -443,21 +828,16 @@ function GetAuthTokenUser {
     param (
 
     )
-
-    $clientId = [string]$script:mainWindow.clientIdTextBox.Text
-    $tenantId = [string]$script:mainWindow.tenantIdTextBox.Text
     
     # Get Auth Code needed for Token
     $authCode = GetAuthCodeUser
 
-    Write-Host $authCode[1]
-
     # Construct URI
-    $uri = [uri]"https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
+    $uri = [uri]"https://login.microsoftonline.com/$script:tenant/oauth2/v2.0/token"
 
     # Construct Body
     $body = @{
-        client_id    = $clientId
+        client_id    = $script:clientId
         scope        = "$script:scope offline_access" # Add offline_access to scope to ensure refresh_token is issued
         code         = $authCode[1]
         redirect_uri = $script:mainWindow.redirectUriTextBox.Text
@@ -491,15 +871,12 @@ function GetAuthTokenUserRefresh {
 
     )
 
-    $clientId = [string]$script:mainWindow.clientIdTextBox.Text
-    $tenantId = [string]$script:mainWindow.tenantIdTextBox.Text
-
     # Construct URI
-    $uri = [uri]"https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
+    $uri = [uri]"https://login.microsoftonline.com/$script:tenant/oauth2/v2.0/token"
 
     # Construct Body
     $body = @{
-        client_id     = $clientId
+        client_id     = $script:clientId
         scope         = "$script:scope offline_access" # Add offline_access to scope to ensure refresh_token is issued
         redirect_uri  = $script:mainWindow.redirectUriTextBox.Text
         grant_type    = "refresh_token"
@@ -579,7 +956,7 @@ function InvokeGraphAPICall {
         
         [Parameter(mandatory = $true)][string]$method,
         [Parameter(mandatory = $true)][uri]$uri,
-        [Parameter(mandatory = $false)][string]$body,
+        [Parameter(mandatory = $false)]$body,
         [Parameter(mandatory = $false)][string]$contentType,
         [Parameter(mandatory = $false)][switch]$silent
 
@@ -617,7 +994,7 @@ function InvokeGraphAPICall {
     }
         
     # Construct headers
-    $Headers = @{"Authorization" = "Bearer $($script:issuedToken.access_token)"}
+    $Headers = @{"Authorization" = "Bearer $($script:issuedToken.access_token)" }
 
     $apiCall = try {
 
@@ -627,7 +1004,9 @@ function InvokeGraphAPICall {
         # If there is a body (and it's not a GET), use it
         if ($body -and $method -ne "GET") {
 
-            Invoke-RestMethod -Method $method -Uri $uri -ContentType $contentType -Headers $Headers -Body $body -ErrorAction Stop
+            $bodyJson = $body | ConvertTo-Json -Depth 5 | ForEach-Object { [regex]::Unescape($_) }
+
+            Invoke-RestMethod -Method $method -Uri $uri -ContentType $contentType -Headers $Headers -Body $bodyJson -ErrorAction Stop
 
         }
         else {
@@ -642,37 +1021,32 @@ function InvokeGraphAPICall {
         if (-not $silent) {
 
             ErrorPrompt -messageBody "Exception was caught: $($_.Exception.Message) URI $uri" -messageTitle "Error on Graph API call"
-            $script:lastAPICallSuccess = $false
 
         }
 
+        $script:lastAPICallSuccess = $false
+
     }
 
-        return $apiCall
+    return $apiCall
 
 }
-function ValidateTextBox {
+function ValidateRegex {
     param (
         
-        [Parameter(mandatory = $true)][string]$textbox,
+        [Parameter(mandatory = $true)][string]$value,
         [Parameter(mandatory = $true)][string]$regex
 
     )
-    
-    # Remove existing validation from hashtable
-    $script:inputs.Remove($textbox)
 
-    if ($script:mainWindow.$textbox.Text -match $regex -or $script:mainWindow.$textbox.Password -match $regex) {
+    if ($value -match $regex) {
 
-        $script:mainWindow.$textbox.BorderBrush = "Green"
-        $script:inputs.Add($textbox, $true)
+        return $true
 
     }
     else {
 
-        $script:mainWindow.$textbox.BorderBrush = "Red"
-        $script:inputs.Add($textbox, $false)
-        Write-Warning "$textbox is not validated."
+        return $false
 
     }
 
@@ -690,8 +1064,9 @@ function GetTeamInformation {
 
     }
 
-    # Reset current channel ID and disable channel tab control (as Team may have changed)
+    # Reset current channel and tab ID and disable channel tab control (as Team may have changed)
     $script:currentChannelId = $null
+    $script:currentTabId = $null
     $script:mainWindow.channelTabControl.IsEnabled = $false
 
     if (-not [string]::IsNullOrEmpty($script:currentTeamId)) {
@@ -699,7 +1074,7 @@ function GetTeamInformation {
         # Team #
         ########
         $team = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId"
-        $script:mainWindow.teamArchivedTextBlock.Text = $team.isArchived
+        $script:mainWindow.teamArchivedCheckBox.IsChecked = $team.isArchived
         # Member Settings
         $script:mainWindow.allowCreateUpdateChannelsCheckBox.IsChecked = $team.memberSettings.allowCreateUpdateChannels
         $script:mainWindow.allowDeleteChannelsCheckBox.IsChecked = $team.memberSettings.allowDeleteChannels
@@ -717,7 +1092,7 @@ function GetTeamInformation {
         $script:mainWindow.allowChannelMentionsCheckBox.IsChecked = $team.messagingSettings.allowChannelMentions
         # Fun Settings
         $script:mainWindow.allowGiphyCheckBox.IsChecked = $team.funSettings.allowGiphy
-        $script:mainWindow.giphyContentRatingComboBox.SelectedItem = (Get-culture).TextInfo.ToTitleCase($team.funSettings.giphyContentRating)
+        $script:mainWindow.giphyContentRatingComboBox.SelectedItem = (Get-Culture).TextInfo.ToTitleCase($team.funSettings.giphyContentRating)
         $script:mainWindow.allowStickersAndMemesCheckBox.IsChecked = $team.funSettings.allowStickersAndMemes
         $script:mainWindow.allowCustomMemesCheckBox.IsChecked = $team.funSettings.allowCustomMemes
 
@@ -727,7 +1102,7 @@ function GetTeamInformation {
         $script:mainWindow.teamDisplayNameTextBlock.Text = $group.displayName
         $script:mainWindow.teamDescriptionTextBlock.Text = $group.description
         $script:mainWindow.teamVisibilityTextBlock.Text = $group.visibility
-        $script:mainWindow.teamPrivacyComboBox.SelectedItem = (Get-culture).TextInfo.ToTitleCase($group.visibility)
+        $script:mainWindow.teamPrivacyComboBox.SelectedItem = (Get-Culture).TextInfo.ToTitleCase($group.visibility)
         $script:mainWindow.teamCreatedDateTextBlock.Text = (Get-Date -Date $group.createdDateTime -Format 'g')
         # Expiry date
         if ($group.expirationDateTime) {
@@ -743,12 +1118,6 @@ function GetTeamInformation {
         $script:mainWindow.teamMailTextBlock.Text = $group.mail
         $script:mainWindow.teamDisplayNameTextBox.Text = $group.displayName
         $script:mainWindow.teamDescriptionTextBox.Text = $group.description
-
-        # Team Photo/Image #
-        ####################
-        #$teamPhoto = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/photo/`$value" -contentType "image/jpg"
-        #$teamPhoto | Out-File -FilePath "team.jpg"
-        #$script:mainWindow.teamPhoto.ImageSource = $teamPhoto
 
         # Members #
         ###########
@@ -817,9 +1186,9 @@ function GetTeamInformation {
         $totalChannels = (($channels).value).Count
         $script:mainWindow.totalTeamChannelsTextBlock.Text = $totalChannels
         $script:mainWindow.teamChannelsTextBlock.Text = "Channels ($totalChannels):"
-        $script:mainWindow.channelsListBox.DisplayMemberPath = "displayName"
-        $script:mainWindow.channelsListBox.SelectedValuePath = "id"
-        $script:mainWindow.channelsListBox.ItemsSource = $channels.value
+        $script:mainWindow.channelsComboBox.DisplayMemberPath = "displayName"
+        $script:mainWindow.channelsComboBox.SelectedValuePath = "id"
+        $script:mainWindow.channelsComboBox.ItemsSource = $channels.value
 
         # Enable Tabs
         $script:mainWindow.teamTabControl.IsEnabled = $true
@@ -829,14 +1198,18 @@ function GetTeamInformation {
         if ($team.isArchived -eq $true) {
             
             $script:mainWindow.teamSettingsStackPanel.IsEnabled = $false
+            $script:mainWindow.channelsStackPanel.IsEnabled = $false
             $script:mainWindow.archiveTeamButton.IsEnabled = $false
             $script:mainWindow.updateTeamButton.IsEnabled = $false
             $script:mainWindow.unarchiveTeamButton.IsEnabled = $true
 
+            
+        }
         # Not archived
-        } elseif ($team.isArchived -eq $false) {
+        elseif ($team.isArchived -eq $false) {
             
             $script:mainWindow.teamSettingsStackPanel.IsEnabled = $true
+            $script:mainWindow.channelsStackPanel.IsEnabled = $true
             $script:mainWindow.archiveTeamButton.IsEnabled = $true
             $script:mainWindow.updateTeamButton.IsEnabled = $true
             $script:mainWindow.unarchiveTeamButton.IsEnabled = $false
@@ -852,13 +1225,17 @@ function GetChannelInformation {
 
     )
 
-    if ($script:mainWindow.channelsListBox.SelectedValue) {
+    if ($script:mainWindow.channelsComboBox.SelectedValue) {
 
-        $script:currentChannelId = $script:mainWindow.channelsListBox.SelectedValue
+        $script:currentChannelId = $script:mainWindow.channelsComboBox.SelectedValue
 
     }
 
     if (-not [string]::IsNullOrEmpty($script:currentChannelId)) {
+
+        # Reset Tab Id and disable Tab as Channel may have changed
+        $script:currentTabId = $null
+        $script:mainWindow.tabSettingStackPanel.IsEnabled = $false
 
         # Channel #
         ###########
@@ -873,14 +1250,13 @@ function GetChannelInformation {
             $script:mainWindow.channelIsFavouriteByDefault1CheckBox.IsChecked = $channel.isFavoriteByDefault
             $script:mainWindow.channelIsFavouriteByDefault2CheckBox.IsChecked = $channel.isFavoriteByDefault
 
-        } else {
+        }
+        else {
 
             $script:mainWindow.channelIsFavouriteByDefault1CheckBox.IsChecked = $false
             $script:mainWindow.channelIsFavouriteByDefault2CheckBox.IsChecked = $false
 
         }
-        
-        Write-Host $channel
 
         # Tabs #
         ########
@@ -888,11 +1264,45 @@ function GetChannelInformation {
         $totalTabs = (($tabs).value).Count
         $script:mainWindow.totalChannelTabsTextBlock.Text = $totalTabs
         $script:mainWindow.channelTabsTextBlock.Text = "Tabs ($totalTabs):"
+        $script:mainWindow.channelTabsComboBox.DisplayMemberPath = "displayName"
+        $script:mainWindow.channelTabsComboBox.SelectedValuePath = "id"
+        $script:mainWindow.channelTabsComboBox.ItemsSource = $tabs.value
 
         # Enable Tabs
         $script:mainWindow.channelTabControl.IsEnabled = $true
     
     }
+
+}
+
+function GetTabInformation {
+    param (
+        
+    )
+
+    if ($script:mainWindow.channelTabsComboBox.SelectedValue) {
+
+        $script:currentTabId = $script:mainWindow.channelTabsComboBox.SelectedValue
+
+    }
+
+    if (-not [string]::IsNullOrEmpty($script:currentTabId)) {
+
+        # Tab #
+        #######
+        $tab = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs/$script:currentTabId"
+        $script:mainWindow.tabTeamsAppIdTextBox.Text = $tab.teamsAppId
+        $script:mainWindow.tabDisplayNameTextBox.Text = $tab.displayName
+        $script:mainWindow.tabEntityIdTextBox.Text = $tab.configuration.entityId
+        $script:mainWindow.tabContentUrlTextBox.Text = $tab.configuration.contentUrl
+        $script:mainWindow.tabRemoveUrlTextBox.Text = $tab.configuration.removeUrl
+        $script:mainWindow.tabWebsiteUrlTextBox.Text = $tab.configuration.websiteUrl
+
+        # Enable UI
+        $script:mainWindow.tabSettingStackPanel.IsEnabled = $true
+    
+    }
+    
 }
 function ListTeams {
     param (
@@ -923,7 +1333,7 @@ function FilterTeams {
     $script:mainWindow.teamsListBox.SelectedValuePath = "id"
 
     # Filter Teams
-    $filteredTeams = $script:teams.value | Where-Object {$_.displayName -like "*$teamsFilterText*"} | Sort-Object -Property displayName
+    $filteredTeams = $script:teams.value | Where-Object { $_.displayName -like "*$teamsFilterText*" } | Sort-Object -Property displayName
     
     # Teams Total
     $totalTeams = ($filteredTeams).Count
@@ -974,7 +1384,7 @@ function AddTeam {
 
     # Load Window
     # Declare Objects
-    $addTeamWindow = @{}
+    $window = @{ }
 
     # Load XAML
     [xml]$xaml = @"
@@ -982,32 +1392,61 @@ function AddTeam {
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="AddTeamWindow"
-    Title="Create Team" Width="640" SizeToContent="Height"
+    Title="Add Team" Width="640" SizeToContent="Height" FontSize="13"
     >
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Vertical" Margin="10,0">
             <GroupBox Header="Standard Team" Margin="0,5">
                 <StackPanel>
                     <RadioButton x:Name="standardTeamRadioButton" Content="Create a Standard Team" GroupName="teamType" IsChecked="True" Margin="0,10,0,0"/>
-                    <GroupBox Header="General" Margin="10">
-                        <StackPanel Orientation="Horizontal" Margin="5">
-                            <StackPanel Orientation="Vertical">
-                                <Label Content="Team Name:" HorizontalAlignment="Right"/>
-                                <Label Content="Team Description:" HorizontalAlignment="Right"/>
-                                <Label Content="Privacy:" HorizontalAlignment="Right"/>
-                                <Label Content="Team Owner:" HorizontalAlignment="Right"/>
+                    <Expander Header="General" IsExpanded="True">
+                        <StackPanel Orientation="Vertical" Margin="5">
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBox x:Name="teamNameTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
                             </StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="5,0">
-                                <TextBox x:Name="teamNameTextBox" Width="400" Height="23" HorizontalAlignment="Left" Margin="0,1.5"/>
-                                <TextBox x:Name="teamDescriptionTextBox" Width="400" HorizontalAlignment="Left" Height="23" Margin="0,1.5"/>
-                                <ComboBox x:Name="teamPrivacyComboBox" MinWidth="100" HorizontalAlignment="Left" Margin="0,1.5"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox x:Name="teamOwnerTextBox" Width="250" Height="23" Margin="0,1.5"/>
-                                    <TextBlock x:Name="teamOwnerDisplayNameTextBlock" Width="200" Margin="5,3" Text="User: "/>
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBox x:Name="teamDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="Privacy:" Width="120" VerticalAlignment="Center" TextAlignment="Right"/>
+                                <ComboBox x:Name="teamPrivacyComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="Owner:" Width="120" VerticalAlignment="Top" TextAlignment="Right"/>
+                                <StackPanel Orientation="Vertical">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                                        <TextBlock Text="User (UPN):" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+                                        <TextBox x:Name="userTextBox" TextWrapping="Wrap" Margin="5,0" Width="350"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock Text="Name:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="userDisplayNameTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock Text="Title:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="userJobTitleTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock Text="Location:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="userLocationTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button x:Name="addTeamOwnerButton" Content="Add" Width="60" Margin="5,0" IsEnabled="False"/>
+                                    </StackPanel>
+                                    <DataGrid x:Name="teamOwnersDataGrid" AutoGenerateColumns="False" Margin="0,5" MinHeight="50" SelectionMode="Single" AlternatingRowBackground="#FFE5E5F1" AlternationCount="2" GridLinesVisibility="None">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
+                                            <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
+                                            <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
-                    </GroupBox>
+                    </Expander>
                     <Expander Header="Additional Channels">
                         <StackPanel Orientation="Vertical" Margin="30,10">
                             <StackPanel Orientation="Horizontal">
@@ -1028,7 +1467,7 @@ function AddTeam {
                                     <TextBox x:Name="teamChannelDescription5TextBox" Width="150" Margin="0,2" Height="22"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical" Margin="5,0,0,0">
-                                    <Label Content="Favourite:"/>
+                                    <Label Content="Is Favourite:"/>
                                     <CheckBox x:Name="teamChannelFavourite1CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
                                     <CheckBox x:Name="teamChannelFavourite2CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
                                     <CheckBox x:Name="teamChannelFavourite3CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
@@ -1042,14 +1481,6 @@ function AddTeam {
                                     <CheckBox x:Name="teamChannelWiki3CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
                                     <CheckBox x:Name="teamChannelWiki4CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
                                     <CheckBox x:Name="teamChannelWiki5CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Vertical" Margin="5,0,0,0">
-                                    <Label Content="OneNote:"/>
-                                    <CheckBox x:Name="teamChannelOneNote1CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelOneNote2CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelOneNote3CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelOneNote4CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelOneNote5CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
@@ -1110,7 +1541,8 @@ function AddTeam {
             <GroupBox Header="Custom Team" Margin="0,5">
                 <StackPanel Orientation="Vertical" Margin="10">
                     <RadioButton x:Name="customTeamRadioButton" Content="Create a Custom Team using JSON" GroupName="teamType" IsChecked="False" Margin="0,10"/>
-                    <TextBlock Text="Example JSON for creating Teams can be found at the Graph API documentation: https://docs.microsoft.com/en-gb/graph/api/team-post?view=graph-rest-beta" TextWrapping="Wrap" FontStyle="Italic" Margin="10,0"/>
+                    <TextBlock Text="Example JSON for creating Teams can be found at the Graph API documentation:" FontStyle="Italic" Margin="10,0"/>
+                    <TextBlock Text="https://docs.microsoft.com/en-gb/graph/api/team-post?view=graph-rest-beta" Margin="10,0"/>
                     <Expander Header="JSON" Margin="0,10">
                         <TextBox x:Name="customJSONTextBox" MaxLines="30" MinLines="10" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" Margin="5"/>
                     </Expander>
@@ -1131,63 +1563,82 @@ function AddTeam {
     # Create a Window Object
     $WindowObject = [Windows.Markup.XamlReader]::Load($XMLReader)
 
-    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]")  | ForEach-Object {
+    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object {
 
-        $addTeamWindow.Add($_.Name, $WindowObject.FindName($_.Name))
+        try {
+            $window.Add($_.Name, $WindowObject.FindName($_.Name))
+        }
+        catch {
+
+        }
 
     }
 
     # Populate UI
     # Privacy
     $privacyOptions = @("Private", "Public") | Sort-Object
-    $addTeamWindow.teamPrivacyComboBox.ItemsSource = $privacyOptions
-    $addTeamWindow.teamPrivacyComboBox.SelectedItem = "Private"
+    $window.teamPrivacyComboBox.ItemsSource = $privacyOptions
+    $window.teamPrivacyComboBox.SelectedItem = "Private"
     # Giphy
     $giphyOptions = @("Strict", "Moderate") | Sort-Object
-    $addTeamWindow.giphyContentRatingComboBox.ItemsSource = $giphyOptions
-    $addTeamWindow.giphyContentRatingComboBox.SelectedItem = "Moderate"
+    $window.giphyContentRatingComboBox.ItemsSource = $giphyOptions
+    $window.giphyContentRatingComboBox.SelectedItem = "Moderate"
 
     # Events
     # Cancel Clicked
-    $addTeamWindow.cancelButton.add_Click( {
+    $window.cancelButton.add_Click( {
 
             # Close Window
-            $addTeamWindow.AddTeamWindow.Close()
+            $window.AddTeamWindow.Close()
 
         })
 
-    # Owner text changed
-    $addTeamWindow.teamOwnerTextBox.add_TextChanged( {
+    # User text changed
+    $window.userTextBox.add_TextChanged( {
 
-            $upn = $addTeamWindow.teamOwnerTextBox.Text
-            $user = InvokeGraphAPICall -method "GET" -Uri "https://graph.microsoft.com/beta/users/$upn" -silent
+            $upn = $window.userTextBox.Text
 
-            # If user is found
-            if ($user) {
+            # Validate UPN
+            if ($upn) {
 
-                $addTeamWindow.teamOwnerDisplayNameTextBlock.Text = "User: $($user.displayName)"
+                $validUPN = ValidateRegex $upn "([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)"
 
-            }
-            else {
+                if ($validUPN -eq $true) {
 
-                $addTeamWindow.teamOwnerDisplayNameTextBlock.Text = "User: "
+                    $user = InvokeGraphAPICall -method "GET" -Uri "https://graph.microsoft.com/beta/users/$upn" -silent
+
+                }
+
+                # If user id is found
+                if ($user.id) {
+
+                    $window.userDisplayNameTextBlock.Text = $user.displayName
+                    $window.userJobTitleTextBlock.Text = $user.jobTitle
+                    $window.userLocationTextBlock.Text = $user.officeLocation
+                    $window.addTeamOwnerButton.IsEnabled = $true
+
+                }
+                else {
+
+                    $window.userDisplayNameTextBlock.Text = $null
+                    $window.userJobTitleTextBlock.Text = $null
+                    $window.userLocationTextBlock.Text = $null
+                    $window.addTeamOwnerButton.IsEnabled = $false
+
+                }
 
             }
 
         })
 
     # Add Clicked
-    $addTeamWindow.addTeamButton.add_Click( {
+    $window.addTeamButton.add_Click( {
 
             # Standard Team
-            if ($addTeamWindow.standardTeamRadioButton.IsChecked -eq $true) {
-
-                # Check owner is valid
-                $upn = $addTeamWindow.teamOwnerTextBox.Text
-                $user = InvokeGraphAPICall -method "GET" -Uri "https://graph.microsoft.com/beta/users/$upn" -silent
+            if ($window.standardTeamRadioButton.IsChecked -eq $true) {
 
                 # Check the bare minumum is valid
-                if ($addTeamWindow.teamNameTextBox.Text -and $addTeamWindow.teamDescriptionTextBox.Text -and $addTeamWindow.teamPrivacyComboBox.SelectedItem -and $user.id) {
+                if ($window.teamNameTextBox.Text -and $window.teamDescriptionTextBox.Text -and $window.teamPrivacyComboBox.SelectedItem) {
 
                     # Build Channel and Tabs
                     $channels = @()
@@ -1196,19 +1647,16 @@ function AddTeam {
                         # Current values
                         $currentTeamChannelName = "teamChannelDisplayName$($i)TextBox"
                         $currentTeamChannelDescription = "teamChannelDescription$($i)TextBox"
-                        $currentTeamFavourite = "teamChannelFavourite$($i)CheckBox"
-                        $currentTeamWiki = "teamChannelWiki$($i)CheckBox"
-                        $currentTeamOneNote = "teamChannelOneNote$($i)CheckBox"
+                        $currentTeamChannelFavourite = "teamChannelFavourite$($i)CheckBox"
+                        $currentTeamChannelWiki = "teamChannelWiki$($i)CheckBox"
 
                         # If channel has a name, let's use it
-                        if ($addTeamWindow.$currentTeamChannelName.Text) {
+                        if ($window.$currentTeamChannelName.Text) {
 
                             $tabs = @()
 
-                            Write-Host $addTeamWindow.$currentTeamWiki.IsChecked
-
                             # Wiki Tab
-                            if ($addTeamWindow.$currentTeamWiki.IsChecked -eq $true) {
+                            if ($window.$currentTeamChannelWiki.IsChecked -eq $true) {
 
                                 $wikiTab = @{
 
@@ -1223,9 +1671,9 @@ function AddTeam {
 
                             $channel = @{
 
-                                displayName         = $addTeamWindow.$currentTeamChannelName.Text
-                                description         = $addTeamWindow.$currentTeamChannelDescription.Text
-                                isFavoriteByDefault = $addTeamWindow.$currentTeamFavourite.IsChecked
+                                displayName         = $window.$currentTeamChannelName.Text
+                                description         = $window.$currentTeamChannelDescription.Text
+                                isFavoriteByDefault = $window.$currentTeamChannelFavourite.IsChecked
 
                                 tabs                = $tabs
 
@@ -1237,55 +1685,61 @@ function AddTeam {
             
                     }
 
+                    # Owners
+                    $owners = @()
+                    $window.teamOwnersDataGrid.ItemsSource | ForEach-Object {
+
+                        $owners += "https://graph.microsoft.com/beta/users('$($_.id)')"
+
+                    }
+
                     # Build base request body
                     $body = @{
 
                         # General
                         'template@odata.bind' = "https://graph.microsoft.com/beta/teamsTemplates('standard')"
-                        displayName           = $addTeamWindow.teamNameTextBox.Text
-                        description           = $addTeamWindow.teamDescriptionTextBox.Text
-                        'owners@odata.bind'   = @(
-                            "https://graph.microsoft.com/beta/users('$($user.id)')"
-                        )
-                        visibility            = $addTeamWindow.teamPrivacyComboBox.SelectedItem
+                        displayName           = $window.teamNameTextBox.Text
+                        description           = $window.teamDescriptionTextBox.Text
+                        'owners@odata.bind'   = $owners
+                        visibility            = $window.teamPrivacyComboBox.SelectedItem
 
                         # Member Settings
                         memberSettings        = @{
 
-                            allowCreateUpdateChannels         = $addTeamWindow.allowCreateUpdateChannelsCheckBox.IsChecked
-                            allowDeleteChannels               = $addTeamWindow.allowDeleteChannelsCheckBox.IsChecked
-                            allowAddRemoveApps                = $addTeamWindow.allowAddRemoveAppsCheckBox.IsChecked
-                            allowCreateUpdateRemoveTabs       = $addTeamWindow.allowCreateUpdateRemoveTabsCheckBox.IsChecked
-                            allowCreateUpdateRemoveConnectors = $addTeamWindow.allowCreateUpdateRemoveConnectorsCheckBox.IsChecked
+                            allowCreateUpdateChannels         = $window.allowCreateUpdateChannelsCheckBox.IsChecked
+                            allowDeleteChannels               = $window.allowDeleteChannelsCheckBox.IsChecked
+                            allowAddRemoveApps                = $window.allowAddRemoveAppsCheckBox.IsChecked
+                            allowCreateUpdateRemoveTabs       = $window.allowCreateUpdateRemoveTabsCheckBox.IsChecked
+                            allowCreateUpdateRemoveConnectors = $window.allowCreateUpdateRemoveConnectorsCheckBox.IsChecked
 
                         }
 
                         # Guest Settings
                         guestSettings         = @{
 
-                            allowCreateUpdateChannels = $addTeamWindow.allowGuestCreateUpdateChannelsCheckBox.IsChecked
-                            allowDeleteChannels       = $addTeamWindow.allowGuestDeleteChannelsCheckBox.IsChecked
+                            allowCreateUpdateChannels = $window.allowGuestCreateUpdateChannelsCheckBox.IsChecked
+                            allowDeleteChannels       = $window.allowGuestDeleteChannelsCheckBox.IsChecked
 
                         }
 
                         # Messaging Settings
                         messagingSettings     = @{
 
-                            allowUserEditMessages    = $addTeamWindow.allowUserEditMessagesCheckBox.IsChecked
-                            allowUserDeleteMessages  = $addTeamWindow.allowUserDeleteMessagesCheckBox.IsChecked
-                            allowOwnerDeleteMessages = $addTeamWindow.allowOwnerDeleteMessagesCheckBox.IsChecked
-                            allowTeamMentions        = $addTeamWindow.allowTeamMentionsCheckBox.IsChecked
-                            allowChannelMentions     = $addTeamWindow.allowChannelMentionsCheckBox.IsChecked
+                            allowUserEditMessages    = $window.allowUserEditMessagesCheckBox.IsChecked
+                            allowUserDeleteMessages  = $window.allowUserDeleteMessagesCheckBox.IsChecked
+                            allowOwnerDeleteMessages = $window.allowOwnerDeleteMessagesCheckBox.IsChecked
+                            allowTeamMentions        = $window.allowTeamMentionsCheckBox.IsChecked
+                            allowChannelMentions     = $window.allowChannelMentionsCheckBox.IsChecked
 
                         }
 
                         # Fun Settings
                         funSettings           = @{
 
-                            allowGiphy            = $addTeamWindow.allowGiphyCheckBox.IsChecked
-                            giphyContentRating    = $addTeamWindow.giphyContentRatingComboBox.SelectedItem
-                            allowStickersAndMemes = $addTeamWindow.allowStickersAndMemesCheckBox.IsChecked
-                            allowCustomMemes      = $addTeamWindow.allowCustomMemesCheckBox.IsChecked
+                            allowGiphy            = $window.allowGiphyCheckBox.IsChecked
+                            giphyContentRating    = $window.giphyContentRatingComboBox.SelectedItem
+                            allowStickersAndMemes = $window.allowStickersAndMemesCheckBox.IsChecked
+                            allowCustomMemes      = $window.allowCustomMemesCheckBox.IsChecked
 
                         }
 
@@ -1294,24 +1748,21 @@ function AddTeam {
 
                     }
 
-                    # Convert body to JSON
-                    $bodyJson = $body | ConvertTo-Json -Depth 5 | ForEach-Object { [regex]::Unescape($_) }
-
                 }
                 else {
 
-                    ErrorPrompt -messageBody "Not all fields are complete. Ensure your Team has a name, a description and an owner." -messageTitle "Incomplete"
+                    ErrorPrompt -messageBody "Not all fields are complete. Ensure the Team has a name, a description and an owner." -messageTitle "Incomplete"
 
                 }
 
                 # Custom Team
             }
-            elseif ($addTeamWindow.customTeamRadioButton.IsChecked -eq $true) {
+            elseif ($window.customTeamRadioButton.IsChecked -eq $true) {
                 
                 # If text in JSON text box
-                if ($addTeamWindow.customJSONTextBox.Text) {
+                if ($window.customJSONTextBox.Text) {
 
-                    $bodyJson = $addTeamWindow.customJSONTextBox.Text
+                    $body = $window.customJSONTextBox.Text
 
                 }
                 else {
@@ -1323,35 +1774,89 @@ function AddTeam {
             }
 
             # If JSON body is available
-            if ($bodyJson) {
+            if ($body) {
 
                 # Create Team
-                InvokeGraphAPICall -method "POST" -uri "https://graph.microsoft.com/beta/teams" -body $bodyJson
+                InvokeGraphAPICall -method "POST" -uri "https://graph.microsoft.com/beta/teams" -body $body
 
                 # Check if success
-                if($script:lastAPICallSuccess -eq $true) {
+                if ($script:lastAPICallSuccess -eq $true) {
 
-                    $buttonType = [System.Windows.MessageBoxButton]::OK
-                    $messageIcon = [System.Windows.MessageBoxImage]::Information
-                    $messageBody = "Team has been created."
-                    $messageTitle = "Team Created"
-            
-                    [System.Windows.MessageBox]::Show($messageBody, $messageTitle, $buttonType, $messageIcon)
+                    OKPrompt -messageBody "Team has been created." -messageTitle "Team Created"
+
+                    # Close Window
+                    $window.AddTeamWindow.Close()
+        
+                    # Refresh Team list
+                    ListTeams
 
                 }
-                
-                # Close Window
-                $addTeamWindow.AddTeamWindow.Close()
-        
-                # Refresh Team list
-                ListTeams
 
             }
 
         })
 
+    # Add Owner Clicked
+    $window.addTeamOwnerButton.add_Click( {
+
+            # Get ID of UPN in textbox
+            $upn = $window.userTextBox.Text
+            $user = InvokeGraphAPICall -method "GET" -Uri "https://graph.microsoft.com/beta/users/$upn" -silent
+
+            # If user is found
+            if ($user.id -and $script:lastAPICallSuccess -eq $true) {
+
+                $ownersDataGrid = @()
+
+                <# Currently can only have one owner at time of creation, so cannot use!
+
+                # Existing owners
+                $existingOwners = $window.teamOwnersDataGrid.ItemsSource
+                $existingOwners | ForEach-Object {
+
+                    # If a valid owner with id and not the same as the 'new owner' id
+                    if ($_.id -and $_.id -ne $user.id) {
+
+                        $owner = @{
+
+                            displayName       = $_.displayName
+                            userPrincipalName = $_.userPrincipalName
+                            jobTitle          = $_.jobTitle
+                            officeLocation    = $_.officeLocation
+                            id                = $_.id
+        
+                        }
+        
+                        $ownersDataGrid += New-Object PSObject -Property $owner
+
+                    }
+                }
+
+                #>
+
+                # New owner
+                $owner = @{
+
+                    displayName       = $user.displayName
+                    userPrincipalName = $user.userPrincipalName
+                    jobTitle          = $user.jobTitle
+                    officeLocation    = $user.officeLocation
+                    id                = $user.id
+
+                }
+
+                $ownersDataGrid += New-Object PSObject -Property $owner
+
+                # Add new and existing owners
+                $window.teamOwnersDataGrid.ItemsSource = $ownersDataGrid
+
+                # 
+
+            }
+        })
+
     # Show Window
-    $addTeamWindow.AddTeamWindow.ShowDialog()
+    $window.AddTeamWindow.ShowDialog()
 }
 
 function DeleteTeam {
@@ -1363,13 +1868,12 @@ function DeleteTeam {
     # If there is a current team
     if (-not [string]::IsNullOrEmpty($script:currentTeamId)) {
 
-        # Get current Team name from group
-        $group = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId"
+        $teamName = $script:mainWindow.teamDisplayNameTextBlock.Text
 
         # Confirm deletion
         $buttonType = [System.Windows.MessageBoxButton]::YesNo
         $messageIcon = [System.Windows.MessageBoxImage]::Question
-        $messageBody = "Are you sure you want to delete the Team '$($group.displayName)'?"
+        $messageBody = "Are you sure you want to delete the Team '$teamName'?"
         $messageTitle = "Confirm Deletion"
  
         $result = [System.Windows.MessageBox]::Show($messageBody, $messageTitle, $buttonType, $messageIcon)
@@ -1381,26 +1885,23 @@ function DeleteTeam {
             InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId"
 
             # Check if success
-            if($script:lastAPICallSuccess -eq $true) {
-
-                $buttonType = [System.Windows.MessageBoxButton]::OK
-                $messageIcon = [System.Windows.MessageBoxImage]::Information
-                $messageBody = "Team has been deleted."
-                $messageTitle = "Team Deleted"
+            if ($script:lastAPICallSuccess -eq $true) {
         
-                [System.Windows.MessageBox]::Show($messageBody, $messageTitle, $buttonType, $messageIcon)
+                OKPrompt -messageBody "Team has been deleted." -messageTitle "Team Deleted"
+
+                # Clear current Team, Channel and Tab as it no longer exists
+                $script:currentTeamId = $null
+                $script:currentChannelId = $null
+                $script:currentTabId = $null
+
+                # Disable UI
+                $script:mainWindow.teamTabControl.IsEnabled = $false
+
+                # Reload Team List
+                ListTeams            
 
             }
-
-            # Clear current Team as it no longer exists
-            $script:currentTeamId = $null
-
-            # Disable UI
-            $script:mainWindow.teamTabControl.IsEnabled = $false
-
-            # Reload Team List
-            ListTeams            
-
+            
         }
 
     }
@@ -1420,9 +1921,9 @@ function UpdateTeam {
         $groupBody = @{
 
             # General
-            displayName           = $script:mainWindow.teamDisplayNameTextBox.Text
-            description           = $script:mainWindow.teamDescriptionTextBox.Text
-            visibility            = $script:mainWindow.teamPrivacyComboBox.SelectedItem
+            displayName = $script:mainWindow.teamDisplayNameTextBox.Text
+            description = $script:mainWindow.teamDescriptionTextBox.Text
+            visibility  = $script:mainWindow.teamPrivacyComboBox.SelectedItem
 
         }
 
@@ -1430,7 +1931,7 @@ function UpdateTeam {
         $teamBody = @{
 
             # Member Settings
-            memberSettings        = @{
+            memberSettings    = @{
 
                 allowCreateUpdateChannels         = $script:mainWindow.allowCreateUpdateChannelsCheckBox.IsChecked
                 allowDeleteChannels               = $script:mainWindow.allowDeleteChannelsCheckBox.IsChecked
@@ -1441,7 +1942,7 @@ function UpdateTeam {
             }
 
             # Guest Settings
-            guestSettings         = @{
+            guestSettings     = @{
 
                 allowCreateUpdateChannels = $script:mainWindow.allowGuestCreateUpdateChannelsCheckBox.IsChecked
                 allowDeleteChannels       = $script:mainWindow.allowGuestDeleteChannelsCheckBox.IsChecked
@@ -1449,7 +1950,7 @@ function UpdateTeam {
             }
 
             # Messaging Settings
-            messagingSettings     = @{
+            messagingSettings = @{
 
                 allowUserEditMessages    = $script:mainWindow.allowUserEditMessagesCheckBox.IsChecked
                 allowUserDeleteMessages  = $script:mainWindow.allowUserDeleteMessagesCheckBox.IsChecked
@@ -1460,7 +1961,7 @@ function UpdateTeam {
             }
 
             # Fun Settings
-            funSettings           = @{
+            funSettings       = @{
 
                 allowGiphy            = $script:mainWindow.allowGiphyCheckBox.IsChecked
                 giphyContentRating    = $script:mainWindow.giphyContentRatingComboBox.SelectedItem
@@ -1471,35 +1972,26 @@ function UpdateTeam {
 
         }
 
-        # Convert body to JSON
-        $groupBodyJson = $groupBody | ConvertTo-Json -Depth 5 | ForEach-Object { [regex]::Unescape($_) }
-        $teamBodyJson = $teamBody | ConvertTo-Json -Depth 5 | ForEach-Object { [regex]::Unescape($_) }
-
     }
     else {
 
-        ErrorPrompt -messageBody "Not all fields are complete. Ensure your Team has a name and a description." -messageTitle "Incomplete"
+        ErrorPrompt -messageBody "Not all fields are complete. Ensure the Team has a name and a description." -messageTitle "Incomplete"
 
     }
 
     # If JSON body is available
-    if ($groupBodyJson -and $teamBodyJson) {
+    if ($groupBody -and $teamBody) {
 
         # Update Group
-        InvokeGraphAPICall -method "PATCH" -uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId" -body $groupBodyJson
+        InvokeGraphAPICall -method "PATCH" -uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId" -body $groupBody
 
         # Update Team
-        InvokeGraphAPICall -method "PATCH" -uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId" -body $teamBodyJson
+        InvokeGraphAPICall -method "PATCH" -uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId" -body $teamBody
 
         # Check if success
-        if($script:lastAPICallSuccess -eq $true) {
-
-            $buttonType = [System.Windows.MessageBoxButton]::OK
-            $messageIcon = [System.Windows.MessageBoxImage]::Information
-            $messageBody = "Team has been updated."
-            $messageTitle = "Team Updated"
+        if ($script:lastAPICallSuccess -eq $true) {
     
-            [System.Windows.MessageBox]::Show($messageBody, $messageTitle, $buttonType, $messageIcon)
+            OKPrompt -messageBody "Team has been updated." -messageTitle "Team Updated"
 
         }
 
@@ -1521,21 +2013,16 @@ function ArchiveTeam {
         
     )
 
-    if(-not [string]::IsNullOrEmpty($script:currentTeamId)) {
+    if (-not [string]::IsNullOrEmpty($script:currentTeamId)) {
 
         InvokeGraphAPICall -method "POST" -uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/$task"
 
     }
 
     # Check if success
-    if($script:lastAPICallSuccess -eq $true) {
+    if ($script:lastAPICallSuccess -eq $true) {
 
-        $buttonType = [System.Windows.MessageBoxButton]::OK
-        $messageIcon = [System.Windows.MessageBoxImage]::Information
-        $messageBody = "Team has been $task`d."
-        $messageTitle = "Team $task`d"
-
-        [System.Windows.MessageBox]::Show($messageBody, $messageTitle, $buttonType, $messageIcon)
+        OKPrompt -messageBody "Team has been $task`d." -messageTitle "Team $task`d"
 
     }
 
@@ -1544,6 +2031,674 @@ function ArchiveTeam {
     
 }
 
+function CloneTeam {
+
+    param (
+
+    )
+
+    # Load Window
+    # Declare Objects
+    $window = @{ }
+
+    # Load XAML
+    [xml]$xaml = @"
+    <Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="CloneTeamWindow"
+    Title="Clone Team" Width="420" SizeToContent="Height" FontSize="13.5"
+    >
+    <StackPanel Orientation="Vertical" Margin="10,0">
+        <StackPanel Orientation="Vertical" Margin="5">
+            
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                <TextBox x:Name="teamNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="250"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                <TextBox x:Name="teamDescriptionTextBox" TextWrapping="Wrap" Margin="5,0" Width="250"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Mail Nickname:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                <TextBox x:Name="mailNicknameTextBox" TextWrapping="Wrap" Margin="5,0" Width="250"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Privacy:" Width="120" VerticalAlignment="Center" TextAlignment="Right"/>
+                <ComboBox x:Name="teamPrivacyComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Clone Apps:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                <CheckBox x:Name="cloneAppsCheckBox" VerticalAlignment="Center" Margin="5,0" IsChecked="True"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Clone Tabs:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                <CheckBox x:Name="cloneTabsCheckBox" VerticalAlignment="Center" Margin="5,0" IsChecked="True"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Clone Settings:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                <CheckBox x:Name="cloneSettingsCheckBox" VerticalAlignment="Center" Margin="5,0" IsChecked="True"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Clone Channels:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                <CheckBox x:Name="cloneChannelsCheckBox" VerticalAlignment="Center" Margin="5,0" IsChecked="True"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Clone Members:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                <CheckBox x:Name="cloneMembersCheckBox" VerticalAlignment="Center" Margin="5,0" IsChecked="True"/>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="cloneTeamButton" Content="Clone" Margin="10" Width="100"/>
+            <Button x:Name="cancelButton" Content="Cancel" Margin="10" Width="100"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
+"@
+
+    # Feed XAML in to XMLNodeReader
+    $XMLReader = (New-Object System.Xml.XmlNodeReader $xaml)
+
+    # Create a Window Object
+    $WindowObject = [Windows.Markup.XamlReader]::Load($XMLReader)
+
+    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object {
+
+        try {
+            $window.Add($_.Name, $WindowObject.FindName($_.Name))
+        }
+        catch {
+
+        }
+
+    }
+
+    # Get current Group info
+    $group = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId"
+
+    # Populate UI
+    # Privacy
+    $privacyOptions = @("Private", "Public") | Sort-Object
+    $window.teamPrivacyComboBox.ItemsSource = $privacyOptions
+    $window.teamPrivacyComboBox.SelectedItem = $group.visibility
+
+    # Events
+    # Cancel Clicked
+    $window.cancelButton.add_Click( {
+
+            # Close Window
+            $window.CloneTeamWindow.Close()
+
+        })
+
+    # Clone Clicked
+    $window.cloneTeamButton.add_Click( {
+
+            # Check the bare minumum is valid
+            if ($window.teamNameTextBox.Text -and $window.teamDescriptionTextBox.Text -and $window.teamPrivacyComboBox.SelectedItem -and $window.mailNicknameTextBox.Text) {
+
+                # Collect options selected
+                $options = @()
+
+                if ($window.cloneAppsCheckBox.IsChecked -eq $true) {
+                    
+                    $options += "apps"
+
+                }
+
+                if ($window.cloneTabsCheckBox.IsChecked -eq $true) {
+                    
+                    $options += "tabs"
+
+                }
+
+                if ($window.cloneSettingsCheckBox.IsChecked -eq $true) {
+                    
+                    $options += "settings"
+
+                }
+
+                if ($window.cloneChannelsCheckBox.IsChecked -eq $true) {
+                    
+                    $options += "channels"
+
+                }
+
+                if ($window.cloneMembersCheckBox.IsChecked -eq $true) {
+                    
+                    $options += "members"
+
+                }
+
+                # Build Team
+                $body = @{
+
+                    displayName  = $window.teamNameTextBox.Text
+                    description  = $window.teamDescriptionTextBox.Text
+                    mailNickname = $window.mailNicknameTextBox.Text # Known issue, graph ignores this value!
+                    visibility   = $window.teamPrivacyComboBox.SelectedItem
+                    partsToClone = $options -join ","
+
+                }
+
+            }
+            else {
+
+                ErrorPrompt -messageBody "Not all fields are complete. Ensure the Team has a name, a description and mail nickname." -messageTitle "Incomplete"
+
+            }
+
+            # If JSON body is available
+            if ($body) {
+
+                # Clone Team
+                InvokeGraphAPICall -method "POST" -uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/clone" -body $body
+
+                # Check if success
+                if ($script:lastAPICallSuccess -eq $true) {
+
+                    OKPrompt -messageBody "Team has been cloned. It may take a few minutes to appear." -messageTitle "Team Cloned"
+
+                }                
+
+                # Close Window
+                $window.CloneTeamWindow.Close()
+        
+                # Reload Teams List
+                ListTeams
+
+            }
+
+        })
+
+    # Show Window
+    $window.CloneTeamWindow.ShowDialog()
+
+}
+
+function AddChannel {
+
+    param (
+
+    )
+
+    # Load Window
+    # Declare Objects
+    $window = @{ }
+
+    # Load XAML
+    [xml]$xaml = @"
+    <Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="AddChannelWindow"
+    Title="Add Channel" Width="420" SizeToContent="Height" FontSize="13"
+    >
+    <StackPanel Orientation="Vertical" Margin="10,0">
+        <StackPanel Orientation="Vertical" Margin="5">
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Channel Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="channelNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Channel Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="channelDescriptionTextBox" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Is Favourite:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                        <CheckBox x:Name="channelFavouriteCheckBox" VerticalAlignment="Center" Margin="5,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Create Wiki Tab:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                        <CheckBox x:Name="channelWikiCheckBox" VerticalAlignment="Center" Margin="5,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Create OneNote Tab:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                        <CheckBox x:Name="channelOneNoteCheckBox" VerticalAlignment="Center" Margin="5,0"/>
+                <TextBlock Text="Name:" VerticalAlignment="Center" Margin="5,0"/>
+                <TextBox x:Name="channelOneNoteNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="100"/>
+            </StackPanel>
+        </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="addChannelButton" Content="Add" Margin="10" Width="100"/>
+            <Button x:Name="cancelButton" Content="Cancel" Margin="10" Width="100"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
+"@
+
+    # Feed XAML in to XMLNodeReader
+    $XMLReader = (New-Object System.Xml.XmlNodeReader $xaml)
+
+    # Create a Window Object
+    $WindowObject = [Windows.Markup.XamlReader]::Load($XMLReader)
+
+    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object {
+
+        try {
+            $window.Add($_.Name, $WindowObject.FindName($_.Name))
+        }
+        catch {
+
+        }
+    }
+
+    # Events
+    # Cancel Clicked
+    $window.cancelButton.add_Click( {
+
+            # Close Window
+            $window.AddChannelWindow.Close()
+
+        })
+
+    # Add Clicked
+    $window.addChannelButton.add_Click( {
+
+            # Check the bare minumum is valid
+            if ($window.channelNameTextBox.Text -and $window.channelDescriptionTextBox.Text) {
+
+                # Build Channel
+                $body = @{
+
+                    displayName         = $window.channelNameTextBox.Text
+                    description         = $window.channelDescriptionTextBox.Text
+                    isFavoriteByDefault = $window.channelFavouriteCheckBox.IsChecked
+
+                }
+
+            }
+            else {
+
+                ErrorPrompt -messageBody "Not all fields are complete. Ensure the Channel has a name and a description." -messageTitle "Incomplete"
+
+            }
+
+            # If JSON body is available
+            if ($body) {
+
+                # Create Channel
+                $channel = InvokeGraphAPICall -method "POST" -uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels" -body $body
+
+                # Check if success
+                if ($script:lastAPICallSuccess -eq $true -and $channel.id) {
+
+                    # Set current channel Id to newly created channel
+                    $script:currentChannelId = $channel.id
+
+                    # Wiki Tab
+                    if ($window.channelWikiCheckBox.IsChecked -eq $true) {
+
+                        AddWikiTab -wikiName "Setup Wiki"
+
+                    }
+
+                    # Create OneNote notebook and Tab once Channel has been created and returned
+                    if ($window.channelOneNoteCheckBox.IsChecked -eq $true -and $window.channelOneNoteNameTextBox.Text) {
+
+                        AddOneNoteTab -notebookName $window.channelOneNoteNameTextBox.Text
+
+                    }
+
+                    OKPrompt -messageBody "Channel has been created." -messageTitle "Channel Created"
+
+                    # Close Window
+                    $window.AddChannelWindow.Close()
+        
+                    # Refresh Team
+                    GetTeamInformation
+
+                }                
+
+            }
+
+        })
+
+    # Show Window
+    $window.AddChannelWindow.ShowDialog()
+}
+
+function DeleteChannel {
+
+    param (
+
+    )
+
+    # If there is a current team and channel
+    if (-not [string]::IsNullOrEmpty($script:currentTeamId) -and -not [string]::IsNullOrEmpty($script:currentChannelId)) {
+
+        $channelName = $script:mainWindow.channelsComboBox.SelectedItem.DisplayName
+
+        # Confirm deletion
+        $buttonType = [System.Windows.MessageBoxButton]::YesNo
+        $messageIcon = [System.Windows.MessageBoxImage]::Question
+        $messageBody = "Are you sure you want to delete the Channel '$channelName'?"
+        $messageTitle = "Confirm Deletion"
+ 
+        $result = [System.Windows.MessageBox]::Show($messageBody, $messageTitle, $buttonType, $messageIcon)
+
+        # If yes
+        if ($result -eq "Yes") {
+
+            # Delete Channel
+            InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId"
+
+            # Check if success
+            if ($script:lastAPICallSuccess -eq $true) {
+        
+                OKPrompt -messageBody "Channel has been deleted." -messageTitle "Channel Deleted"
+
+                # Clear current Channel as it no longer exists
+                $script:currentChannelId = $null
+
+                # Reload Team
+                GetTeamInformation
+
+            }        
+
+        }
+
+    }
+
+}
+
+function UpdateChannel {
+
+    param (
+
+    )
+
+    if (-not [string]::IsNullOrEmpty($script:currentTeamId) -and -not [string]::IsNullOrEmpty($script:currentChannelId) -and $script:mainWindow.channelDisplayNameTextBox.Text -and $script:mainWindow.channelDescriptionTextBox.Text) {
+
+        # Build request body for Channel
+        $body = @{
+
+            # General
+            displayName         = $script:mainWindow.channelDisplayNameTextBox.Text
+            description         = $script:mainWindow.channelDescriptionTextBox.Text
+            isFavoriteByDefault = $script:mainWindow.channelIsFavouriteByDefault2CheckBox.IsChecked
+
+        }
+
+    }
+    else {
+
+        ErrorPrompt -messageBody "Not all fields are complete. Ensure the Channel has a name and a description." -messageTitle "Incomplete"
+
+    }
+
+    # If JSON body is available
+    if ($body) {
+
+        # Update Channel
+        InvokeGraphAPICall -method "PATCH" -uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/channels/$script:currentChannelId" -body $body
+
+        # Check if success
+        if ($script:lastAPICallSuccess -eq $true) {
+    
+            OKPrompt -messageBody "Channel has been updated." -messageTitle "Channel Updated"
+
+        }
+
+        # Reload Team
+        GetTeamInformation
+
+    }
+
+}
+
+function AddTab {
+
+    param (
+
+    )
+
+    # Load Window
+    # Declare Objects
+    $window = @{ }
+
+    # Load XAML
+    [xml]$xaml = @"
+    <Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="AddTabWindow"
+    Title="Add Tab" Width="420" SizeToContent="Height" FontSize="13"
+    >
+    <StackPanel Orientation="Vertical" Margin="10,0">
+        <StackPanel Orientation="Vertical" Margin="5">
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Tab Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                <TextBox x:Name="tabNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Tab Type:" Width="120" VerticalAlignment="Center" TextAlignment="Right"/>
+                <ComboBox x:Name="tabTypeComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+                <TextBlock Text="Website Tab URL:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                <TextBox x:Name="tabURLTextBox" TextWrapping="Wrap" Margin="5,0" Width="200" IsEnabled="False"/>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="addTabButton" Content="Add" Margin="10" Width="100"/>
+            <Button x:Name="cancelButton" Content="Cancel" Margin="10" Width="100"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
+"@
+
+    # Feed XAML in to XMLNodeReader
+    $XMLReader = (New-Object System.Xml.XmlNodeReader $xaml)
+
+    # Create a Window Object
+    $WindowObject = [Windows.Markup.XamlReader]::Load($XMLReader)
+
+    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object {
+
+        try {
+            $window.Add($_.Name, $WindowObject.FindName($_.Name))
+        }
+        catch {
+
+        }
+
+    }
+
+    # Populate UI
+    # Tab Type
+    $tabTypes = @("Wiki", "OneNote", "Website") | Sort-Object
+    $window.tabTypeComboBox.ItemsSource = $tabTypes
+    $window.tabTypeComboBox.SelectedItem = "Wiki"
+
+    # Events
+    # Cancel Clicked
+    $window.cancelButton.add_Click( {
+
+            # Close Window
+            $window.AddTabWindow.Close()
+
+        })
+
+    # Add Clicked
+    $window.addTabButton.add_Click( {
+
+            $tab = $null
+
+            # Check the bare minumum is valid
+            if ($window.tabNameTextBox.Text -and $window.tabTypeComboBox.SelectedItem) {
+
+                # Wiki type?
+                if ($window.tabTypeComboBox.SelectedItem -eq "Wiki") {
+                    
+                    $tab = AddWikiTab -wikiName $window.tabNameTextBox.Text
+                
+                    # OneNote type?
+                }
+                elseif ($window.tabTypeComboBox.SelectedItem -eq "OneNote") {
+                    
+                    $tab = AddOneNoteTab -notebookName $window.tabNameTextBox.Text
+
+                    # Website type?
+                }
+                elseif ($window.tabTypeComboBox.SelectedItem -eq "Website") {
+                   
+                    # Validate URL
+                    $validURL = ValidateRegex $window.tabURLTextBox.Text "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+
+                    if ($validURL -eq $true) {
+
+                        # Add Website Tab
+                        $tab = AddWebsiteTab -WebsiteName $window.tabNameTextBox.Text -WebsiteURL $window.tabURLTextBox.Text
+
+                    }
+                    else {
+
+                        ErrorPrompt -messageBody "Not a valid URL, please correct." -messageTitle "Invalid URL"
+
+                    }
+                    
+                }
+                else {
+
+                    ErrorPrompt -messageBody "No Tab Type has been selected." -messageTitle "No Tab Type selected"
+
+                }
+
+                if ($tab) {
+            
+                    OKPrompt -messageBody "Tab has been created." -messageTitle "Tab Created"   
+
+                    # Close Window
+                    $window.AddTabWindow.Close()
+            
+                    # Refresh Channel
+                    GetChannelInformation
+
+                }
+
+
+            }
+            else {
+
+                ErrorPrompt -messageBody "Not all fields are complete. Ensure the Tab has a name and a type selected." -messageTitle "Incomplete"
+
+            }
+
+        })
+
+    # Tab Type Selection Changed
+    $window.tabTypeComboBox.add_SelectionChanged( {
+
+            # Website type?
+            if ($window.tabTypeComboBox.SelectedItem -eq "Website") {
+
+                # Enable Website textbox
+                $window.tabURLTextBox.IsEnabled = $true
+
+            }
+            else {
+
+                # Disable Website textbox
+                $window.tabURLTextBox.IsEnabled = $false
+`
+        
+            }
+
+        })
+
+    # Show Window
+    $window.AddTabWindow.ShowDialog()
+
+}
+
+function DeleteTab {
+
+    param (
+
+    )
+
+    # If there is a current team, channel and tab
+    if (-not [string]::IsNullOrEmpty($script:currentTeamId) -and -not [string]::IsNullOrEmpty($script:currentChannelId) -and -not [string]::IsNullOrEmpty($script:currentTabId)) {
+
+        $tabName = $script:mainWindow.tabDisplayNameTextBox.Text
+
+        # Confirm deletion
+        $buttonType = [System.Windows.MessageBoxButton]::YesNo
+        $messageIcon = [System.Windows.MessageBoxImage]::Question
+        $messageBody = "Are you sure you want to delete the Tab '$tabName'?"
+        $messageTitle = "Confirm Deletion"
+ 
+        $result = [System.Windows.MessageBox]::Show($messageBody, $messageTitle, $buttonType, $messageIcon)
+
+        # If yes
+        if ($result -eq "Yes") {
+
+            # Delete Tab
+            InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs/$script:currentTabId"
+
+            # Check if success
+            if ($script:lastAPICallSuccess -eq $true) {
+        
+                OKPrompt -messageBody "Tab has been deleted." -messageTitle "Tab Deleted"
+
+                # Clear current Tab as it no longer exists
+                $script:currentTabId = $null
+
+                # Refresh Channel
+                GetChannelInformation
+
+            }        
+
+        }
+
+    }
+
+}
+
+function UpdateTab {
+
+    param (
+
+    )
+
+    # If there is a current team, channel and tab
+    if (-not [string]::IsNullOrEmpty($script:currentTeamId) -and -not [string]::IsNullOrEmpty($script:currentChannelId) -and -not [string]::IsNullOrEmpty($script:currentTabId) -and $script:mainWindow.tabDisplayNameTextBox.Text) {
+
+        # Build request body for Tab
+        $body = @{
+
+            displayName = $script:mainWindow.tabDisplayNameTextBox.Text
+
+        }
+
+    }
+    else {
+
+        ErrorPrompt -messageBody "Not all fields are complete. Ensure the Tab has a name." -messageTitle "Incomplete"
+
+    }
+
+    # If JSON body is available
+    if ($body) {
+
+        # Update Tab
+        InvokeGraphAPICall -method "PATCH" -uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs/$script:currentTabId" -body $body
+
+        # Check if success
+        if ($script:lastAPICallSuccess -eq $true) {
+    
+            OKPrompt -messageBody "Tab has been updated." -messageTitle "Tab Updated"
+
+        }
+
+        # Refresh Channel
+        GetChannelInformation
+
+    }
+
+}
 function AddUserToTeam {
     param (
 
@@ -1553,7 +2708,7 @@ function AddUserToTeam {
     
     # Load Window
     # Declare Objects
-    $addUserWindow = @{}
+    $window = @{ }
 
     # Load XAML
     [xml]$xaml = @"
@@ -1561,33 +2716,31 @@ function AddUserToTeam {
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="AddUserWindow"
-    Title="Add User" Width="400" SizeToContent="WidthAndHeight"
+    Title="Add User" Width="400" SizeToContent="WidthAndHeight" FontSize="13"
     >
 <StackPanel Orientation="Vertical" Margin="10">
-    <StackPanel Orientation="Horizontal">
-        <Label x:Name="addUserLabel" Content="User (UPN):"/>
-        <TextBox x:Name="addUserTextBox" Width="300" Height="23"/>
-    </StackPanel>
-    <StackPanel Orientation="Horizontal" Margin="0,10">
-        <StackPanel Orientation="Vertical">
-            <TextBlock Text="Name:" HorizontalAlignment="Right"/>
-            <TextBlock Text="Title:" HorizontalAlignment="Right"/>
-            <TextBlock Text="Location:" HorizontalAlignment="Right"/>
+        <StackPanel Orientation="Horizontal" Margin="0,2">
+            <TextBlock Text="User (UPN):" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+            <TextBox x:Name="userTextBox" TextWrapping="Wrap" Margin="5,0" Width="200"/>
         </StackPanel>
-        <StackPanel Orientation="Vertical" Margin="5,0">
-            <TextBlock x:Name="userDisplayNameTextBlock" HorizontalAlignment="Left"/>
-            <TextBlock x:Name="userJobTitleTextBlock" HorizontalAlignment="Left"/>
-            <TextBlock x:Name="userLocationTextBlock" HorizontalAlignment="Left"/>
+        <StackPanel Orientation="Horizontal" Margin="0,2">
+            <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+            <TextBlock x:Name="userDisplayNameTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
         </StackPanel>
-    </StackPanel>
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Margin="0,2">
+            <TextBlock Text="Title:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+            <TextBlock x:Name="userJobTitleTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,2">
+            <TextBlock Text="Location:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+            <TextBlock x:Name="userLocationTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
         <Button x:Name="addUserAddButton" Content="Add" Margin="10" Width="100" IsEnabled="False"/>
         <Button x:Name="addUserCancelButton" Content="Cancel" Margin="10" Width="100"/>
     </StackPanel>
 </StackPanel>
 </Window>
-
-
 "@
 
     # Feed XAML in to XMLNodeReader
@@ -1596,75 +2749,103 @@ function AddUserToTeam {
     # Create a Window Object
     $WindowObject = [Windows.Markup.XamlReader]::Load($XMLReader)
 
-    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]")  | ForEach-Object {
+    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object {
 
-        $addUserWindow.Add($_.Name, $WindowObject.FindName($_.Name))
+        try {
+            $window.Add($_.Name, $WindowObject.FindName($_.Name))
+        }
+        catch {
+
+        }
 
     }
 
     # Events
-    # User Text Changed
-    $addUserWindow.addUserTextBox.add_TextChanged( {
+    # User text changed
+    $window.userTextBox.add_TextChanged( {
 
-            $upn = $addUserWindow.addUserTextBox.Text
-            $user = InvokeGraphAPICall -method "GET" -Uri "https://graph.microsoft.com/beta/users/$upn" -silent
+            $upn = $window.userTextBox.Text
 
-            # If user is found
-            if ($user) {
+            # Validate UPN
+            if ($upn) {
 
-                $addUserWindow.userDisplayNameTextBlock.Text = $user.displayName
-                $addUserWindow.userJobTitleTextBlock.Text = $user.jobTitle
-                $addUserWindow.userLocationTextBlock.Text = $user.officeLocation
-                $addUserWindow.addUserAddButton.IsEnabled = $true
+                $validUPN = ValidateRegex $upn "([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)"
 
-            }
-            else {
+                if ($validUPN -eq $true) {
 
-                $addUserWindow.userDisplayNameTextBlock.Text = $null
-                $addUserWindow.userJobTitleTextBlock.Text = $null
-                $addUserWindow.userLocationTextBlock.Text = $null
-                $addUserWindow.addUserAddButton.IsEnabled = $false
+                    $user = InvokeGraphAPICall -method "GET" -Uri "https://graph.microsoft.com/beta/users/$upn" -silent
+
+                }
+
+                # If user id is found
+                if ($user.id) {
+
+                    $window.userDisplayNameTextBlock.Text = $user.displayName
+                    $window.userJobTitleTextBlock.Text = $user.jobTitle
+                    $window.userLocationTextBlock.Text = $user.officeLocation
+                    $window.addUserAddButton.IsEnabled = $true
+
+                    return $user
+
+                }
+                else {
+
+                    $window.userDisplayNameTextBlock.Text = $null
+                    $window.userJobTitleTextBlock.Text = $null
+                    $window.userLocationTextBlock.Text = $null
+                    $window.addUserAddButton.IsEnabled = $false
+
+                }
 
             }
 
         })
 
+    $
+
     # Add User Clicked
-    $addUserWindow.addUserAddButton.add_Click( {
+    $window.addUserAddButton.add_Click( {
     
             # Get ID of UPN in textbox
-            $upn = $addUserWindow.addUserTextBox.Text
+            $upn = $window.userTextBox.Text
             $user = InvokeGraphAPICall -method "GET" -Uri "https://graph.microsoft.com/beta/users/$upn" -silent
 
             # If user is found
-            if ($user) {
+            if ($user.id -and $script:lastAPICallSuccess -eq $true) {
 
-                $body = @{ "@odata.id" = "https://graph.microsoft.com/beta/users/$($user.id)" } | ConvertTo-Json
+                $body = @{ "@odata.id" = "https://graph.microsoft.com/beta/users/$($user.id)" }
 
                 # Add User
                 InvokeGraphAPICall -method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/$type`s/`$ref" -body $body
 
-                # Refresh Team
-                GetTeamInformation
+                # Check if success
+                if ($script:lastAPICallSuccess -eq $true) {
 
-                # Close Window
-                $addUserWindow.AddUserWindow.Close()
+                    OKPrompt -messageBody "$($user.displayname) has been added as a $type to the Team." -messageTitle "User Added To Team"
+
+                    # Refresh Team
+                    GetTeamInformation
+
+                    # Close Window
+                    $window.AddUserWindow.Close()
+
+                } 
 
             }
 
         })
 
     # Cancel Clicked
-    $addUserWindow.addUserCancelButton.add_Click( {
+    $window.addUserCancelButton.add_Click( {
     
             # Close Window
-            $addUserWindow.AddUserWindow.Close()
+            $window.AddUserWindow.Close()
 
 
         })
 
     # Show Window
-    $addUserWindow.AddUserWindow.ShowDialog()
+    $window.AddUserWindow.ShowDialog()
 
 }
 
@@ -1703,6 +2884,120 @@ function RemoveUserFromTeam {
 
 }
 
+function AddWikiTab {
+    param (
+        
+        [Parameter(mandatory = $true)][string]$wikiName
+
+    )
+    
+    # If there is a current team
+    if (-not [string]::IsNullOrEmpty($script:currentTeamId) -and -not [string]::IsNullOrEmpty($script:currentChannelId)) {
+
+        $body = @{
+
+            "teamsApp@odata.bind" = "https://graph.microsoft.com/v1.0/appCatalogs/teamsApps('com.microsoft.teamspace.tab.wiki')"
+            name                  = $wikiName
+
+        }
+
+        $tab = InvokeGraphAPICall -Method "POST" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs" -body $body
+
+        return $tab
+
+    }
+
+}
+
+function AddOneNoteTab {
+
+    param (
+
+        [Parameter(mandatory = $true)][string]$notebookName
+
+    )
+
+    # If there is a current team
+    if (-not [string]::IsNullOrEmpty($script:currentTeamId) -and -not [string]::IsNullOrEmpty($script:currentChannelId)) {
+
+        $notebookBody = @{
+
+            displayName = $notebookName
+
+        }
+
+        $notebook = InvokeGraphAPICall -Method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/onenote/notebooks" -body $notebookBody
+
+        # Check notebook was created
+        if ($script:lastAPICallSuccess -eq $true) {
+
+            $randomGuid = New-Guid
+
+            # URL Encode Parameters
+            $oneNoteWebUrl = [System.Web.HttpUtility]::UrlEncode($notebook.links.oneNoteWebUrl.href)
+            $notebookId = [System.Web.HttpUtility]::UrlEncode($notebook.id)
+
+            $tabBody = @{
+
+                "teamsApp@odata.bind" = "https://graph.microsoft.com/v1.0/appCatalogs/teamsApps('0d820ecd-def2-4297-adad-78056cde7c78')"
+                displayName           = $notebookName
+
+                configuration         = @{
+
+                    entityId   = "$randomGuid`_$($notebook.id)"
+                    contentUrl = "https://www.onenote.com/teams/TabContent?entityid=%7BentityId%7D&subentityid=%7BsubEntityId%7D&auth_upn=%7Bupn%7D&notebookSource=New&notebookSelfUrl=https%3A%2F%2Fwww.onenote.com%2Fapi%2Fv1.0%2FmyOrganization%2Fgroups%2F$script:currentTeamId%2Fnotes%2Fnotebooks%2F$notebookId&oneNoteWebUrl=$oneNoteWebUrl&notebookName=note&ui={locale}&tenantId={tid}"
+                    removeUrl  = "https://www.onenote.com/teams/TabRemove?entityid=%7BentityId%7D&subentityid=%7BsubEntityId%7D&auth_upn=%7Bupn%7D&notebookSource=New&notebookSelfUrl=https%3A%2F%2Fwww.onenote.com%2Fapi%2Fv1.0%2FmyOrganization%2Fgroups%2F$script:currentTeamId%2Fnotes%2Fnotebooks%2F$notebookId&oneNoteWebUrl=$oneNoteWebUrl&notebookName=note&ui={locale}&tenantId={tid}"
+                    websiteUrl = "https://www.onenote.com/teams/TabRedirect?redirectUrl=$oneNoteWebUrl"
+
+                }
+
+            }
+
+            $tab = InvokeGraphAPICall -Method "POST" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs" -body $tabBody
+
+            return $tab
+
+        }
+
+    }
+
+}
+
+function AddWebsiteTab {
+
+    param (
+
+        [Parameter(mandatory = $true)][string]$WebsiteName,
+        [Parameter(mandatory = $true)][string]$WebsiteURL
+
+    )
+
+    # If there is a current team
+    if (-not [string]::IsNullOrEmpty($script:currentTeamId) -and -not [string]::IsNullOrEmpty($script:currentChannelId)) {
+
+        $tabBody = @{
+
+            "teamsApp@odata.bind" = "https://graph.microsoft.com/v1.0/appCatalogs/teamsApps('com.microsoft.teamspace.tab.web')"
+            displayName           = $WebsiteName
+
+            configuration         = @{
+
+                entityId   = $null
+                contentUrl = $WebsiteURL
+                removeUrl  = $null
+                websiteUrl = $WebsiteURL
+
+            }
+
+        }
+
+        $tab = InvokeGraphAPICall -Method "POST" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs" -body $tabBody
+
+        return $tab
+
+    }
+
+}
 function ErrorPrompt {
     param (
         
@@ -1719,7 +3014,21 @@ function ErrorPrompt {
 
 }
 
-$script:inputs = @{}
+
+function OKPrompt {
+    param (
+        
+        [Parameter(mandatory = $true)][string]$messageBody,
+        [Parameter(mandatory = $true)][string]$messageTitle
+
+    )
+
+    $buttonType = [System.Windows.MessageBoxButton]::OK
+    $messageIcon = [System.Windows.MessageBoxImage]::Information
+
+    [System.Windows.MessageBox]::Show($messageBody, $messageTitle, $buttonType, $messageIcon)
+
+}
 
 # Load MainWindow XAML
 LoadMainWindow
@@ -1744,19 +3053,34 @@ $script:mainWindow.connectButton.add_Click( {
         # If there is an issued token
         if ($script:issuedToken.access_token) {
 
-            # Enable Tabs
+            OKPrompt -messageBody "Connected - Successfully obtained Graph API token." -messageTitle "Connected"
+
+            # Change UI State
+            $script:mainWindow.disconnectButton.IsEnabled = $true
+            $script:mainWindow.connectButton.IsEnabled = $false
             $script:mainWindow.teamsTabItem.IsEnabled = $true
+            $script:mainWindow.connectionSettingsStackPanel.IsEnabled = $false
         
-            # List Teams
             ListTeams
 
         }
 
     })
 
+# Disonnect Clicked
+$script:mainWindow.disconnectButton.add_Click( {
+
+        # Change UI State
+        $script:mainWindow.disconnectButton.IsEnabled = $false
+        $script:mainWindow.connectButton.IsEnabled = $true
+        $script:mainWindow.teamsTabItem.IsEnabled = $false
+        $script:mainWindow.connectionSettingsStackPanel.IsEnabled = $true
+
+    })
+
+# Refresh button clicked
 $script:mainWindow.teamsRefreshButton.add_Click( {
         
-        # List Teams
         ListTeams
 
         # Reset filter
@@ -1764,7 +3088,7 @@ $script:mainWindow.teamsRefreshButton.add_Click( {
 
     })
 
-# Team Selection Changes
+# Team Selection Changed
 $script:mainWindow.teamsListBox.add_SelectionChanged( {
 
         GetTeamInformation
@@ -1778,8 +3102,8 @@ $script:mainWindow.teamsFilterTextBox.add_TextChanged( {
 
     })
 
-# Create Team clicked
-$script:mainWindow.createTeamButton.add_Click( {
+# Add Team clicked
+$script:mainWindow.addTeamButton.add_Click( {
 
         AddTeam
 
@@ -1795,16 +3119,23 @@ $script:mainWindow.deleteTeamButton.add_Click( {
 # Archive Team clicked
 $script:mainWindow.archiveTeamButton.add_Click( {
 
-    ArchiveTeam -task archive
+        ArchiveTeam -task archive
 
-})
+    })
 
 # Unarchive Team clicked
 $script:mainWindow.unArchiveTeamButton.add_Click( {
 
-    ArchiveTeam -task unarchive
+        ArchiveTeam -task unarchive
 
-})
+    })
+
+# Clone Team clicked
+$script:mainWindow.cloneTeamButton.add_Click( {
+
+        CloneTeam
+
+    })
 
 # Add Member clicked
 $script:mainWindow.addTeamMemberButton.add_Click( {
@@ -1843,22 +3174,86 @@ $script:mainWindow.removeTeamOwnerButton.add_Click( {
 # Update Team clicked
 $script:mainWindow.updateTeamButton.add_Click( {
 
-    # Update Team
-    UpdateTeam
-})
+        UpdateTeam
+
+    })
 
 # Refresh Team clicked
 $script:mainWindow.refreshTeamButton.add_Click( {
 
-    # Reload Team
-    GetTeamInformation
+        GetTeamInformation
+
+    })
+
+# Channel Selection Changed
+$script:mainWindow.channelsComboBox.add_SelectionChanged( {
+
+        GetChannelInformation
+
+    })
+
+# Add Channel clicked
+$script:mainWindow.addChannelButton.add_Click( {
+
+        AddChannel
+
+    })
+
+# Delete Channel clicked
+$script:mainWindow.deleteChannelButton.add_Click( {
+
+        DeleteChannel
+
+    })
+
+# Update Channel clicked
+$script:mainWindow.updateChannelButton.add_Click( {
+
+        UpdateChannel
+
+    })
+
+# Tab Selection Changed
+$script:mainWindow.channelTabsComboBox.add_SelectionChanged( {
+
+        GetTabInformation
+
+    })
+
+# Add Tab
+$script:mainWindow.addTabButton.add_Click( {
+
+        AddTab
+
+    })
+
+# Delete Tab
+$script:mainWindow.deleteTabButton.add_Click( {
+
+        DeleteTab
+
+    })
+
+# Update Tab
+$script:mainWindow.updateTabButton.add_Click( {
+
+        UpdateTab
+
+    })
+
+# Custom Azure AD App Selected
+$script:mainWindow.useCustomAzureADApplicationRadioButton.add_Click( {
+
+    # Enable UI
+    $script:mainWindow.customAzureADAppStackPanel.IsEnabled = $true
 
 })
 
-# Channel Selection Changes
-$script:mainWindow.channelsListBox.add_SelectionChanged( {
+# Shared Azure AD App Selected
+$script:mainWindow.useSharedAzureADApplicationRadioButton.add_Click( {
 
-    GetChannelInformation
+    # Enable UI
+    $script:mainWindow.customAzureADAppStackPanel.IsEnabled = $false
 
 })
 
