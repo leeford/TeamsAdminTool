@@ -1006,12 +1006,12 @@ function InvokeGraphAPICall {
 
             $bodyJson = $body | ConvertTo-Json -Depth 5 | ForEach-Object { [regex]::Unescape($_) }
 
-            Invoke-RestMethod -Method $method -Uri $uri -ContentType $contentType -Headers $Headers -Body $bodyJson -ErrorAction Stop
+            Invoke-WebRequest -Method $method -Uri $uri -ContentType $contentType -Headers $Headers -Body $bodyJson -ErrorAction Stop
 
         }
         else {
 
-            Invoke-RestMethod -Method $method -Uri $uri -ContentType $contentType -Headers $Headers -ErrorAction Stop
+            Invoke-WebRequest -Method $method -Uri $uri -ContentType $contentType -Headers $Headers -ErrorAction Stop
 
         }
 
@@ -1020,7 +1020,12 @@ function InvokeGraphAPICall {
 
         if (-not $silent) {
 
-            ErrorPrompt -messageBody "Exception was caught: $($_.Exception.Message) URI $uri" -messageTitle "Error on Graph API call"
+            # Error handling taken from http://wahlnetwork.com/2015/02/19/using-try-catch-powershells-invoke-webrequest/ 
+            $responseResult = $_.Exception.Response.GetResponseStream()
+            $responseReader = New-Object System.IO.StreamReader($responseResult)
+            $responseBody = $responseReader.ReadToEnd() | ConvertFrom-Json            
+            
+            ErrorPrompt -messageBody "Exception was caught: $($_.Exception.Message) `rURI: $uri `rResponse Code: $($responseBody.error.code) `rResponse Message: $($responseBody.error.message)" -messageTitle "Error on Graph API call"
 
         }
 
@@ -1028,7 +1033,15 @@ function InvokeGraphAPICall {
 
     }
 
-    return $apiCall
+    # Store any response headers incase they are needed
+    $script:lastAPICallReponseHeaders = $apiCall.Headers
+
+    # Return content (asume it's in JSON format)
+    if ($apiCall.Content) {
+
+        return $apiCall.Content | ConvertFrom-Json  
+
+    }
 
 }
 function ValidateRegex {
@@ -3244,18 +3257,18 @@ $script:mainWindow.updateTabButton.add_Click( {
 # Custom Azure AD App Selected
 $script:mainWindow.useCustomAzureADApplicationRadioButton.add_Click( {
 
-    # Enable UI
-    $script:mainWindow.customAzureADAppStackPanel.IsEnabled = $true
+        # Enable UI
+        $script:mainWindow.customAzureADAppStackPanel.IsEnabled = $true
 
-})
+    })
 
 # Shared Azure AD App Selected
 $script:mainWindow.useSharedAzureADApplicationRadioButton.add_Click( {
 
-    # Enable UI
-    $script:mainWindow.customAzureADAppStackPanel.IsEnabled = $false
+        # Enable UI
+        $script:mainWindow.customAzureADAppStackPanel.IsEnabled = $false
 
-})
+    })
 
 # Show WPF MainWindow
 $script:mainWindow.MainWindow.ShowDialog() | Out-Null
