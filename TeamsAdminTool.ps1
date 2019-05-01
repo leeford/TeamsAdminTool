@@ -8,641 +8,641 @@ function LoadMainWindow {
     )
 
     # Declare Objects
-    $script:mainWindow = @{ }
+    $script:mainWindow = @{}
 
     # Load XAML
     [xml]$xaml = @"
     <Window
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Name="MainWindow"
-        Title="TeamsAdminTool" Width="1200" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize" FontSize="13.5" 
-    >
-    <Window.Resources>
-        <Style TargetType="{x:Type Button}">
-            <Setter Property="Background" Value="#6264A7" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="Height" Value="26" />
-            <Setter Property="MinWidth" Value="100" />
-            <Setter Property="Margin" Value="5,0" />
-            <Setter Property="Padding" Value="5,0" />
-            <Setter Property="SnapsToDevicePixels" Value="True" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border CornerRadius="3" 
-                                BorderBrush="{TemplateBinding BorderBrush}" 
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="MainWindow"
+    Title="TeamsAdminTool" Width="1200" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize" FontSize="13.5" 
+>
+<Window.Resources>
+    <Style TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="#6264A7" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinWidth" Value="100" />
+        <Setter Property="Margin" Value="5,0" />
+        <Setter Property="Padding" Value="5,0" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border CornerRadius="3" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#464775" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="#33344A" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="#BDBDBD" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type TextBox}">
+        <Setter Property="Foreground" Value="#252424" />
+        <Setter Property="BorderBrush" Value="#DFDEDE" />
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="Margin" Value="5,0" />
+        <Setter Property="Padding" Value="2,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Border CornerRadius="3" 
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" 
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                    >
+                        <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="#6264A7" />
+                            <Setter Property="BorderThickness" Value="0,0,0,2" />
+                        </Trigger>
+                        <Trigger Property="IsReadOnly" Value="True">
+                            <Setter Property="Background" Value="#F3F2F1" />
+                            <Setter Property="Foreground" Value="#717070" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="#F3F2F1" />
+                            <Setter Property="Foreground" Value="#717070" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type PasswordBox}">
+        <Setter Property="Foreground" Value="#252424" />
+        <Setter Property="BorderBrush" Value="#DFDEDE" />
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="Margin" Value="5,0" />
+        <Setter Property="Padding" Value="2,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type PasswordBox}">
+                    <Border CornerRadius="3" 
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" 
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                    >
+                        <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="#6264A7" />
+                            <Setter Property="BorderThickness" Value="0,0,0,2" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="#F3F2F1" />
+                            <Setter Property="Foreground" Value="#717070" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type ListBoxItem}">
+        <Setter Property="Foreground" Value="#252424" />
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="Padding" Value="5,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" 
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#E2E2F6" />
+                            <Setter Property="Foreground" Value="#252424" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#6264A7" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type ListBox}">
+        <Setter Property="Foreground" Value="#252424" />
+        <Setter Property="Padding" Value="0,5" />
+        <Setter Property="BorderBrush" Value="#DFDEDE" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBox}">
+                    <Border CornerRadius="3" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
+                        <ScrollViewer Margin="0" Focusable="false">
+                            <StackPanel IsItemsHost="True" />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type RadioButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RadioButton}">
+                    <BulletDecorator Background="Transparent">
+                        <BulletDecorator.Bullet>
+                            <Grid Height="20" Width="20">
+                                <Border Name="Outer" Background="Transparent" BorderBrush="#DFDEDE" BorderThickness="2" CornerRadius="3" />
+                                <Border Name="Mark" CornerRadius="2" Margin="5" Visibility="Hidden" />
+                            </Grid>
+                        </BulletDecorator.Bullet>
+                        <TextBlock Margin="5,0" Foreground="#252424" VerticalAlignment="Center">
+                        <ContentPresenter />
+                        </TextBlock>
+                    </BulletDecorator>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Mark" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="Outer" Property="BorderBrush" Value="#E2E2F6" />
+                            <Setter TargetName="Mark" Property="Background" Value="#E2E2F6" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Mark" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="Outer" Property="BorderBrush" Value="#6264A7" />
+                            <Setter TargetName="Mark" Property="Background" Value="#6264A7" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Outer" Property="BorderBrush" Value="#DFDEDE" />
+                            <Setter TargetName="Mark" Property="Background" Value="#DFDEDE" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type CheckBox}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type CheckBox}">
+                    <BulletDecorator Background="Transparent">
+                        <BulletDecorator.Bullet>
+                            <Grid Height="24" Width="24">
+                                <Border Name="Outer" Background="Transparent" BorderBrush="#DFDEDE" BorderThickness="2" CornerRadius="3" Margin="2"/>
+                                <Border Name="CheckMark" Visibility="Hidden" >
+                                    <Path
+                                    x:Name="CheckMarkPath"
+                                    Width="24" Height="24"
+                                    SnapsToDevicePixels="False"
+                                    StrokeThickness="2"
+                                    Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                                </Border>
+                            </Grid>
+                        </BulletDecorator.Bullet>
+                        <TextBlock Margin="5,0" Foreground="#252424" VerticalAlignment="Center">
+                        <ContentPresenter />
+                        </TextBlock>
+                    </BulletDecorator>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#E2E2F6" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#6264A7" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#DFDEDE" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="GroupBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GroupBox">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0">
+                            <Label Foreground="#252424"
+                                   FontSize="16">
+                                <ContentPresenter ContentSource="Header"/>
+                            </Label>
                         </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#464775" />
-                                <Setter Property="Foreground" Value="White" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#33344A" />
-                                <Setter Property="Foreground" Value="White" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#BDBDBD" />
-                                <Setter Property="Foreground" Value="White" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="{x:Type TextBox}">
-            <Setter Property="Foreground" Value="#252424" />
-            <Setter Property="BorderBrush" Value="#DFDEDE" />
-            <Setter Property="MinHeight" Value="30" />
-            <Setter Property="Margin" Value="5,0" />
-            <Setter Property="Padding" Value="2,0" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type TextBox}">
-                        <Border CornerRadius="3" 
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}" 
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}"
+                        <Border Grid.Row="1"
+                        BorderThickness="2"
+                        BorderBrush="#DFDEDE"
+                        CornerRadius="3"
                         >
-                            <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="BorderBrush" Value="#6264A7" />
-                                <Setter Property="BorderThickness" Value="0,0,0,2" />
-                            </Trigger>
-                            <Trigger Property="IsReadOnly" Value="True">
-                                <Setter Property="Background" Value="#F3F2F1" />
-                                <Setter Property="Foreground" Value="#717070" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#F3F2F1" />
-                                <Setter Property="Foreground" Value="#717070" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="{x:Type PasswordBox}">
-            <Setter Property="Foreground" Value="#252424" />
-            <Setter Property="BorderBrush" Value="#DFDEDE" />
-            <Setter Property="MinHeight" Value="30" />
-            <Setter Property="Margin" Value="5,0" />
-            <Setter Property="Padding" Value="2,0" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type PasswordBox}">
-                        <Border CornerRadius="3" 
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}" 
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}"
-                        >
-                            <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="BorderBrush" Value="#6264A7" />
-                                <Setter Property="BorderThickness" Value="0,0,0,2" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#F3F2F1" />
-                                <Setter Property="Foreground" Value="#717070" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="{x:Type ListBoxItem}">
-            <Setter Property="Foreground" Value="#252424" />
-            <Setter Property="MinHeight" Value="30" />
-            <Setter Property="Padding" Value="5,0" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                        <Border BorderBrush="{TemplateBinding BorderBrush}" 
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#E2E2F6" />
-                                <Setter Property="Foreground" Value="#252424" />
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#6264A7" />
-                                <Setter Property="Foreground" Value="White" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="{x:Type ListBox}">
-            <Setter Property="Foreground" Value="#252424" />
-            <Setter Property="Padding" Value="0,5" />
-            <Setter Property="BorderBrush" Value="#DFDEDE" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ListBox}">
-                        <Border CornerRadius="3" 
-                                BorderBrush="{TemplateBinding BorderBrush}" 
-                                Background="{TemplateBinding Background}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Padding="{TemplateBinding Padding}">
-                            <ScrollViewer Margin="0" Focusable="false">
-                                <StackPanel IsItemsHost="True" />
-                            </ScrollViewer>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="{x:Type RadioButton}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type RadioButton}">
-                        <BulletDecorator Background="Transparent">
-                            <BulletDecorator.Bullet>
-                                <Grid Height="20" Width="20">
-                                    <Border Name="Outer" Background="Transparent" BorderBrush="#DFDEDE" BorderThickness="2" CornerRadius="3" />
-                                    <Border Name="Mark" CornerRadius="2" Margin="5" Visibility="Hidden" />
-                                </Grid>
-                            </BulletDecorator.Bullet>
-                            <TextBlock Margin="5,0" Foreground="#252424" VerticalAlignment="Center">
                             <ContentPresenter />
-                            </TextBlock>
-                        </BulletDecorator>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Mark" Property="Visibility" Value="Visible" />
-                                <Setter TargetName="Outer" Property="BorderBrush" Value="#E2E2F6" />
-                                <Setter TargetName="Mark" Property="Background" Value="#E2E2F6" />
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Mark" Property="Visibility" Value="Visible" />
-                                <Setter TargetName="Outer" Property="BorderBrush" Value="#6264A7" />
-                                <Setter TargetName="Mark" Property="Background" Value="#6264A7" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Outer" Property="BorderBrush" Value="#DFDEDE" />
-                                <Setter TargetName="Mark" Property="Background" Value="#DFDEDE" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="{x:Type CheckBox}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <BulletDecorator Background="Transparent">
-                            <BulletDecorator.Bullet>
-                                <Grid Height="24" Width="24">
-                                    <Border Name="Outer" Background="Transparent" BorderBrush="#DFDEDE" BorderThickness="2" CornerRadius="3" Margin="2"/>
-                                    <Border Name="CheckMark" Visibility="Hidden" >
-                                        <Path
-                                        x:Name="CheckMarkPath"
-                                        Width="24" Height="24"
-                                        SnapsToDevicePixels="False"
-                                        StrokeThickness="2"
-                                        Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
-                                    </Border>
-                                </Grid>
-                            </BulletDecorator.Bullet>
-                            <TextBlock Margin="5,0" Foreground="#252424" VerticalAlignment="Center">
-                            <ContentPresenter />
-                            </TextBlock>
-                        </BulletDecorator>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
-                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#E2E2F6" />
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
-                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#6264A7" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#DFDEDE" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="GroupBox">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="GroupBox">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <Border Grid.Row="0">
-                                <Label Foreground="#252424"
-                                       FontSize="16">
-                                    <ContentPresenter ContentSource="Header"/>
-                                </Label>
-                            </Border>
-                            <Border Grid.Row="1"
-                            BorderThickness="2"
-                            BorderBrush="#DFDEDE"
-                            CornerRadius="3"
-                            >
-                                <ContentPresenter />
-                            </Border>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-    <StackPanel>
-        <TabControl x:Name="mainTabControl" Margin="3" BorderBrush="{x:Null}" >
-            <TabItem x:Name="connectTabItem" Header="Connect" Width="100" Height="30">
-                <StackPanel Orientation="Vertical" Margin="10">
-                    <StackPanel Orientation="Vertical" Margin="0,0,0,10">
-                        <TextBlock Text="TeamsAdminTool" FontSize="20" FontWeight="SemiBold" Foreground="#6264A7"/>
-                        <TextBlock Text="https://github.com/leeford/TeamsAdminTool"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical" x:Name="connectionSettingsStackPanel">
-                        <StackPanel Orientation="Vertical" x:Name="sharedAzureADAppStackPanel" Margin="10">
-                            <RadioButton x:Name="useSharedAzureADApplicationRadioButton" Content="Use Shared Azure AD Application"  GroupName="azureADApplication" IsChecked="True"/>
-                            <TextBlock Text="Use shared Azure AD Application (no further setup required)." FontStyle="Italic" />
-                        </StackPanel>
-                        <StackPanel Orientation="Vertical" Margin="10">
-                        <RadioButton x:Name="useCustomAzureADApplicationRadioButton" Content="Use Custom Azure AD Application"  GroupName="azureADApplication" IsChecked="False"/>
-                        <TextBlock Text="Only required if you don't want to use the shared Azure AD Application." FontStyle="Italic" />
-                        <StackPanel Orientation="Vertical" x:Name="customAzureADAppStackPanel" IsEnabled="False">
-                            <GroupBox Header="Azure AD Application" Margin="10,5">
-                                <StackPanel Orientation="Vertical" Margin="5">
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Application (Client) ID:"/>
-                                        <TextBox x:Name="clientIdTextBox" Margin="5,0" Width="400" HorizontalAlignment="Left"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Tenant (Directory) ID:"/>
-                                        <TextBox x:Name="tenantIdTextBox" Margin="5,0" Width="400" HorizontalAlignment="Left"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </GroupBox>
-                            <GroupBox Header="Permission Type" Margin="10,5">
-                                <StackPanel Orientation="Vertical" Margin="5">
-                                    <RadioButton x:Name="applicationPermissionsRadioButton" Content="Application Permissions" GroupName="Permissions"/>
-                                    <StackPanel Orientation="Horizontal" Margin="0,10">
-                                        <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Client Secret ID:"/>
-                                        <PasswordBox x:Name="clientSecretPasswordBox" Margin="5,0" Width="400" HorizontalAlignment="Left"/>
-                                    </StackPanel>
-                                        <RadioButton x:Name="userPermissionsRadioButton" Content="(Delegated) User Permissions" GroupName="Permissions" IsChecked="True"/>
-                                    <StackPanel Orientation="Horizontal" Margin="0,10">
-                                        <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Redirect URI:"/>
-                                        <TextBox x:Name="redirectUriTextBox" Margin="5,0" Width="400" HorizontalAlignment="Left" Text="https://login.microsoftonline.com/common/oauth2/nativeclient"/>
-                                    </StackPanel>
-
-                                </StackPanel>
-                            </GroupBox>
-                        </StackPanel>
-                    </StackPanel>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</Window.Resources>
+<StackPanel>
+    <TabControl x:Name="mainTabControl" Margin="3" BorderBrush="{x:Null}" >
+        <TabItem x:Name="connectTabItem" Header="Connect" Width="100" Height="30">
+            <StackPanel Orientation="Vertical" Margin="10">
+                <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+                    <TextBlock Text="TeamsAdminTool" FontSize="20" FontWeight="SemiBold" Foreground="#6264A7"/>
+                    <TextBlock Text="https://github.com/leeford/TeamsAdminTool"/>
                 </StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button x:Name="connectButton" Content="Connect"/>
-                        <Button x:Name="disconnectButton" Content="Disconnect" IsEnabled="False"/>
+                <StackPanel Orientation="Vertical" x:Name="connectionSettingsStackPanel">
+                    <StackPanel Orientation="Vertical" x:Name="sharedAzureADAppStackPanel" Margin="10">
+                        <RadioButton x:Name="useSharedAzureADApplicationRadioButton" Content="Use Shared Azure AD Application"  GroupName="azureADApplication" IsChecked="True"/>
+                        <TextBlock Text="Use shared Azure AD Application (no further setup required)." FontStyle="Italic" />
                     </StackPanel>
-
-                </StackPanel>
-            </TabItem>
-            <TabItem x:Name="teamsTabItem" Header="Teams" IsEnabled="False" Width="100" Height="30">
-                <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <Button x:Name="teamsRefreshButton" Content="Refresh Teams"/>
-                        <Button x:Name="addTeamButton" Content="Add Team"/>
-                        <Button x:Name="teamsReportButton" Content="Save Report"/>
-                        <TextBlock Text="Report Type:" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="teamsReportTypeComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="10,0,10,10">
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock x:Name="totalTeamsTextBlock" Text="Teams (0):" FontSize="20" Margin="5,0,0,5"/>
-                            <TextBox x:Name="teamsFilterTextBox"/>
-                            <ListBox x:Name="teamsListBox" Width="220" MaxHeight="735" Margin="4,10"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Vertical" Margin="10,0,0,0">
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock x:Name="teamDisplayNameTextBlock" FontSize="24" FontWeight="SemiBold" />
-                                <TextBlock x:Name="teamDescriptionTextBlock" FontSize="16" />
+                    <StackPanel Orientation="Vertical" Margin="10">
+                    <RadioButton x:Name="useCustomAzureADApplicationRadioButton" Content="Use Custom Azure AD Application"  GroupName="azureADApplication" IsChecked="False"/>
+                    <TextBlock Text="Only required if you don't want to use the shared Azure AD Application." FontStyle="Italic" />
+                    <StackPanel Orientation="Vertical" x:Name="customAzureADAppStackPanel" IsEnabled="False">
+                        <GroupBox Header="Azure AD Application" Margin="10,5">
+                            <StackPanel Orientation="Vertical" Margin="5">
+                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                    <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Application (Client) ID:"/>
+                                    <TextBox x:Name="clientIdTextBox" Margin="5,0" Width="400" HorizontalAlignment="Left"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                    <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Tenant (Directory) ID:"/>
+                                    <TextBox x:Name="tenantIdTextBox" Margin="5,0" Width="400" HorizontalAlignment="Left"/>
+                                </StackPanel>
                             </StackPanel>
-                            <TabControl x:Name="teamTabControl" Height="750" Width="930" IsEnabled="False" Margin="0,10,0,0">
-                                <TabItem x:Name="teamOverviewTabItem" Header="Overview" Width="100" Height="30">
-                                    <StackPanel Orientation="Vertical"  Margin="10">
-                                        <GroupBox Header="Team Overview">
-                                            <StackPanel Orientation="Vertical">
+                        </GroupBox>
+                        <GroupBox Header="Permission Type" Margin="10,5">
+                            <StackPanel Orientation="Vertical" Margin="5">
+                                <RadioButton x:Name="applicationPermissionsRadioButton" Content="Application Permissions" GroupName="Permissions"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,10">
+                                    <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Client Secret ID:"/>
+                                    <PasswordBox x:Name="clientSecretPasswordBox" Margin="5,0" Width="400" HorizontalAlignment="Left"/>
+                                </StackPanel>
+                                    <RadioButton x:Name="userPermissionsRadioButton" Content="(Delegated) User Permissions" GroupName="Permissions" IsChecked="True"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,10">
+                                    <TextBlock Width="150" TextAlignment="Right" VerticalAlignment="Center" Text="Redirect URI:"/>
+                                    <TextBox x:Name="redirectUriTextBox" Margin="5,0" Width="400" HorizontalAlignment="Left" Text="https://login.microsoftonline.com/common/oauth2/nativeclient"/>
+                                </StackPanel>
+
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="connectButton" Content="Connect"/>
+                    <Button x:Name="disconnectButton" Content="Disconnect" IsEnabled="False"/>
+                </StackPanel>
+
+            </StackPanel>
+        </TabItem>
+        <TabItem x:Name="teamsTabItem" Header="Teams" IsEnabled="False" Width="100" Height="30">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal" Margin="10">
+                    <Button x:Name="teamsRefreshButton" Content="Refresh Teams"/>
+                    <Button x:Name="addTeamButton" Content="Add Team"/>
+                    <Button x:Name="teamsReportButton" Content="Save Report"/>
+                    <TextBlock Text="Report Type:" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="teamsReportTypeComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10,0,10,10">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock x:Name="totalTeamsTextBlock" Text="Teams (0):" FontSize="20" Margin="5,0,0,5"/>
+                        <TextBox x:Name="teamsFilterTextBox"/>
+                        <ListBox x:Name="teamsListBox" Width="220" MaxHeight="735" Margin="4,10"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="10,0,0,0">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock x:Name="teamDisplayNameTextBlock" FontSize="24" FontWeight="SemiBold" />
+                            <TextBlock x:Name="teamDescriptionTextBlock" FontSize="16" />
+                        </StackPanel>
+                        <TabControl x:Name="teamTabControl" Height="750" Width="930" IsEnabled="False" Margin="0,10,0,0">
+                            <TabItem x:Name="teamOverviewTabItem" Header="Overview" Width="100" Height="30">
+                                <StackPanel Orientation="Vertical"  Margin="10">
+                                    <GroupBox Header="Team Overview">
+                                        <StackPanel Orientation="Vertical">
+                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                <TextBlock Text="Visbility:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="teamVisibilityTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                <TextBlock Text="Creation Date:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="teamCreatedDateTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                <TextBlock Text="Expiration Date:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="teamExpirationDateTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                <TextBlock Text="Mail:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="teamMailTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                <TextBlock Text="Archived:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                <CheckBox x:Name="teamArchivedCheckBox" Margin="5,0" IsHitTestVisible="False" Focusable="False" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                <TextBlock Text="Members:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="totalTeamMembersTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                <TextBlock Text="Owners:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="totalTeamOwnersTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                <TextBlock Text="Channels:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="totalTeamChannelsTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </GroupBox>
+                                </StackPanel>
+                            </TabItem>
+                            <TabItem x:Name="teamMembersTabItem" Header="Members" Width="100" Height="30">
+                                <StackPanel Orientation="Vertical" Margin="10">
+                                    <TextBlock x:Name="teamMembersTextBlock" Text="Members (0):" FontSize="16"/>
+                                    <DataGrid x:Name="teamMembersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="265" SelectionMode="Single">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
+                                            <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" />
+                                            <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
+                                            <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button x:Name="addTeamMemberButton" Content="Add Member"/>
+                                        <Button x:Name="removeTeamMemberButton" Content="Remove Member"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="teamOwnersTextBlock" Text="Owners (0):" Margin="0,5,0,0" FontSize="16"/>
+                                    <DataGrid x:Name="teamOwnersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="265" SelectionMode="Single">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
+                                            <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" />
+                                            <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
+                                            <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button x:Name="addTeamOwnerButton" Content="Add Owner"/>
+                                        <Button x:Name="removeTeamOwnerButton" Content="Remove Owner"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </TabItem>
+                            <TabItem x:Name="teamChannelsTabItem" Header="Channels" Width="100" Height="30">
+                                <StackPanel Orientation="Vertical" x:Name="channelsStackPanel" Margin="10">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock x:Name="teamChannelsTextBlock" Text="Channels (0):" FontSize="16"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,10">
+                                        <ComboBox x:Name="channelsComboBox" MinWidth="150" VerticalAlignment="Center" />
+                                        <Button x:Name="addChannelButton" Content="Add Channel" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TabControl x:Name="channelTabControl" Height="619" IsEnabled="False" Margin="0,10,0,0">
+                                            <TabItem x:Name="channelOverviewTabItem" Header="Overview" Width="100">
+                                                <StackPanel Orientation="Vertical" Margin="10">
+                                                    <GroupBox Header="Channel Overview">
+                                                        <StackPanel Orientation="Vertical" Margin="5">
+                                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                <TextBlock x:Name="channelDisplayNameTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                <TextBlock x:Name="channelDescriptionTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                <TextBlock Text="Mail:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                <TextBlock x:Name="channelMailTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                <TextBlock Text="Tabs:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                <TextBlock x:Name="totalChannelTabsTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                <TextBlock Text="Favourite By Default:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                <CheckBox x:Name="channelIsFavouriteByDefault1CheckBox" Margin="5,0" IsHitTestVisible="False" Focusable="False" VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </GroupBox>
+                                                </StackPanel>
+                                            </TabItem>
+                                            <TabItem x:Name="channelTabsTabItem" Header="Tabs" Width="100">
+                                                <StackPanel Orientation="Vertical" Margin="10">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock x:Name="channelTabsTextBlock" Text="Tabs (0):" FontSize="16"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,10">
+                                                        <ComboBox x:Name="channelTabsComboBox" MinWidth="150" VerticalAlignment="Center" />
+                                                        <Button x:Name="addTabButton" Content="Add Tab" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <StackPanel x:Name="tabSettingStackPanel" Orientation="Vertical">
+                                                        <GroupBox Header="Tab Overview" Margin="0,10">
+                                                            <StackPanel Orientation="Vertical" Margin="5">
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Name:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBox x:Name="tabDisplayNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="App ID:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBox x:Name="tabTeamsAppIdTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsEnabled="False"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Entity ID:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBox x:Name="tabEntityIdTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsEnabled="False"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Content URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBox x:Name="tabContentUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsEnabled="False"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2" >
+                                                                    <TextBlock Text="Remove URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBox x:Name="tabRemoveUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsEnabled="False"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <TextBlock Text="Website URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                    <TextBox x:Name="tabWebsiteUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsEnabled="False"/>
+                                                                </StackPanel>
+                                                            </StackPanel>
+                                                        </GroupBox>
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                            <Button x:Name="updateTabButton" Content="Save"/>
+                                                            <Button x:Name="deleteTabButton" Content="Delete"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </TabItem>
+                                            <TabItem x:Name="channelSettingsTabItem" Header="Settings" Width="100" VerticalAlignment="Top">
+                                                <StackPanel Orientation="Vertical" Margin="10">
+                                                    <GroupBox Header="General">
+                                                        <StackPanel Orientation="Vertical" Margin="5">
+                                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                <TextBox x:Name="channelDisplayNameTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                <TextBox x:Name="channelDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                <TextBlock Text="Favourite By Default:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                <CheckBox x:Name="channelIsFavouriteByDefault2CheckBox" Margin="5,0" VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </GroupBox>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,10">
+                                                        <Button x:Name="updateChannelButton" Content="Save" />
+                                                        <Button x:Name="refreshChannelButton" Content="Refresh" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </TabItem>
+                                            <TabItem x:Name="channelActionsTabItem" Header="Actions" Width="100">
+                                                <StackPanel Orientation="Vertical" Margin="10" >
+                                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                                        <Button x:Name="deleteChannelButton" Content="Delete" />
+                                                        <TextBlock Text="Delete this Channel" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </TabItem>
+                                        </TabControl>
+                                    </StackPanel>
+                                </StackPanel>
+                            </TabItem>
+                            <TabItem x:Name="teamSettingsTabItem" Header="Settings" Width="100" Height="30" >
+                                <StackPanel Orientation="Vertical" Margin="10">
+                                    <StackPanel x:Name="teamSettingsStackPanel" Orientation="Vertical">
+                                        <GroupBox Header="General">
+                                            <StackPanel Orientation="Vertical" Margin="5">
                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                    <TextBlock Text="Visbility:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                    <TextBlock x:Name="teamVisibilityTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                    <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="teamDisplayNameTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                    <TextBlock Text="Creation Date:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                    <TextBlock x:Name="teamCreatedDateTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                    <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="teamDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                    <TextBlock Text="Expiration Date:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                    <TextBlock x:Name="teamExpirationDateTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                    <TextBlock Text="Mail:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                    <TextBlock x:Name="teamMailTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                    <TextBlock Text="Archived:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                    <CheckBox x:Name="teamArchivedCheckBox" Margin="5,0" IsHitTestVisible="False" Focusable="False" VerticalAlignment="Center"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                    <TextBlock Text="Members:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                    <TextBlock x:Name="totalTeamMembersTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                    <TextBlock Text="Owners:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                    <TextBlock x:Name="totalTeamOwnersTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                    <TextBlock Text="Channels:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                    <TextBlock x:Name="totalTeamChannelsTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                    <TextBlock Text="Privacy:" Width="120" VerticalAlignment="Center" TextAlignment="Right"/>
+                                                    <ComboBox x:Name="teamPrivacyComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </GroupBox>
-                                    </StackPanel>
-                                </TabItem>
-                                <TabItem x:Name="teamMembersTabItem" Header="Members" Width="100" Height="30">
-                                    <StackPanel Orientation="Vertical" Margin="10">
-                                        <TextBlock x:Name="teamMembersTextBlock" Text="Members (0):" FontSize="16"/>
-                                        <DataGrid x:Name="teamMembersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="265" SelectionMode="Single">
-                                            <DataGrid.Columns>
-                                                <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
-                                                <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
-                                                <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" />
-                                                <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
-                                                <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
-                                            </DataGrid.Columns>
-                                        </DataGrid>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Button x:Name="addTeamMemberButton" Content="Add Member"/>
-                                            <Button x:Name="removeTeamMemberButton" Content="Remove Member"/>
-                                        </StackPanel>
-                                        <TextBlock x:Name="teamOwnersTextBlock" Text="Owners (0):" Margin="0,5,0,0" FontSize="16"/>
-                                        <DataGrid x:Name="teamOwnersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="265" SelectionMode="Single">
-                                            <DataGrid.Columns>
-                                                <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
-                                                <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
-                                                <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" />
-                                                <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
-                                                <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
-                                            </DataGrid.Columns>
-                                        </DataGrid>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Button x:Name="addTeamOwnerButton" Content="Add Owner"/>
-                                            <Button x:Name="removeTeamOwnerButton" Content="Remove Owner"/>
-                                        </StackPanel>
-                                    </StackPanel>
-                                </TabItem>
-                                <TabItem x:Name="teamChannelsTabItem" Header="Channels" Width="100" Height="30">
-                                    <StackPanel Orientation="Vertical" x:Name="channelsStackPanel" Margin="10">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock x:Name="teamChannelsTextBlock" Text="Channels (0):" FontSize="16"/>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" Margin="0,10">
-                                            <ComboBox x:Name="channelsComboBox" MinWidth="150" VerticalAlignment="Center" />
-                                            <Button x:Name="addChannelButton" Content="Add Channel" VerticalAlignment="Center" />
-                                        </StackPanel>
-                                        <StackPanel>
-                                            <TabControl x:Name="channelTabControl" Height="619" IsEnabled="False" Margin="0,10,0,0">
-                                                <TabItem x:Name="channelOverviewTabItem" Header="Overview" Width="100">
-                                                    <StackPanel Orientation="Vertical" Margin="10">
-                                                        <GroupBox Header="Channel Overview">
-                                                            <StackPanel Orientation="Vertical" Margin="5">
-                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                    <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBlock x:Name="channelDisplayNameTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
-                                                                </StackPanel>
-                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                    <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBlock x:Name="channelDescriptionTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
-                                                                </StackPanel>
-                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                    <TextBlock Text="Mail:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBlock x:Name="channelMailTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
-                                                                </StackPanel>
-                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                    <TextBlock Text="Tabs:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBlock x:Name="totalChannelTabsTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
-                                                                </StackPanel>
-                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                    <TextBlock Text="Favourite By Default:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <CheckBox x:Name="channelIsFavouriteByDefault1CheckBox" Margin="5,0" IsHitTestVisible="False" Focusable="False" VerticalAlignment="Center"/>
-                                                                </StackPanel>
-                                                            </StackPanel>
-                                                        </GroupBox>
-                                                    </StackPanel>
-                                                </TabItem>
-                                                <TabItem x:Name="channelTabsTabItem" Header="Tabs" Width="100">
-                                                    <StackPanel Orientation="Vertical" Margin="10">
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <TextBlock x:Name="channelTabsTextBlock" Text="Tabs (0):" FontSize="16"/>
-                                                        </StackPanel>
-                                                        <StackPanel Orientation="Horizontal" Margin="0,10">
-                                                            <ComboBox x:Name="channelTabsComboBox" MinWidth="150" VerticalAlignment="Center" />
-                                                            <Button x:Name="addTabButton" Content="Add Tab" VerticalAlignment="Center"/>
-                                                        </StackPanel>
-                                                        <StackPanel x:Name="tabSettingStackPanel" Orientation="Vertical">
-                                                            <GroupBox Header="Tab Overview" Margin="0,10">
-                                                                <StackPanel Orientation="Vertical" Margin="5">
-                                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                        <TextBlock Text="Name:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                        <TextBox x:Name="tabDisplayNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center"/>
-                                                                    </StackPanel>
-                                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                        <TextBlock Text="App ID:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                        <TextBox x:Name="tabTeamsAppIdTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsReadOnly="True"/>
-                                                                    </StackPanel>
-                                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                        <TextBlock Text="Entity ID:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                        <TextBox x:Name="tabEntityIdTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsReadOnly="True"/>
-                                                                    </StackPanel>
-                                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                        <TextBlock Text="Content URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                        <TextBox x:Name="tabContentUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsReadOnly="True"/>
-                                                                    </StackPanel>
-                                                                    <StackPanel Orientation="Horizontal" Margin="0,2" >
-                                                                        <TextBlock Text="Remove URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                        <TextBox x:Name="tabRemoveUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsReadOnly="True"/>
-                                                                    </StackPanel>
-                                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                        <TextBlock Text="Website URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                        <TextBox x:Name="tabWebsiteUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsReadOnly="True"/>
-                                                                    </StackPanel>
-                                                                </StackPanel>
-                                                            </GroupBox>
-                                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                                <Button x:Name="updateTabButton" Content="Save"/>
-                                                                <Button x:Name="deleteTabButton" Content="Delete"/>
-                                                            </StackPanel>
-                                                        </StackPanel>
-                                                    </StackPanel>
-                                                </TabItem>
-                                                <TabItem x:Name="channelSettingsTabItem" Header="Settings" Width="100" VerticalAlignment="Top">
-                                                    <StackPanel Orientation="Vertical" Margin="10">
-                                                        <GroupBox Header="General">
-                                                            <StackPanel Orientation="Vertical" Margin="5">
-                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                    <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBox x:Name="channelDisplayNameTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
-                                                                </StackPanel>
-                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                    <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBox x:Name="channelDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
-                                                                </StackPanel>
-                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                    <TextBlock Text="Favourite By Default:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <CheckBox x:Name="channelIsFavouriteByDefault2CheckBox" Margin="5,0" VerticalAlignment="Center"/>
-                                                                </StackPanel>
-                                                            </StackPanel>
-                                                        </GroupBox>
-                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,10">
-                                                            <Button x:Name="updateChannelButton" Content="Save" />
-                                                            <Button x:Name="refreshChannelButton" Content="Refresh" />
-                                                        </StackPanel>
-                                                    </StackPanel>
-                                                </TabItem>
-                                                <TabItem x:Name="channelActionsTabItem" Header="Actions" Width="100">
-                                                    <StackPanel Orientation="Vertical" Margin="10" >
-                                                        <StackPanel Orientation="Horizontal" Margin="5">
-                                                            <Button x:Name="deleteChannelButton" Content="Delete" />
-                                                            <TextBlock Text="Delete this Channel" VerticalAlignment="Center" />
-                                                        </StackPanel>
-                                                    </StackPanel>
-                                                </TabItem>
-                                            </TabControl>
-                                        </StackPanel>
-                                    </StackPanel>
-                                </TabItem>
-                                <TabItem x:Name="teamSettingsTabItem" Header="Settings" Width="100" Height="30" >
-                                    <StackPanel Orientation="Vertical" Margin="10">
-                                        <StackPanel x:Name="teamSettingsStackPanel" Orientation="Vertical">
-                                            <GroupBox Header="General">
-                                                <StackPanel Orientation="Vertical" Margin="5">
-                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                        <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                        <TextBox x:Name="teamDisplayNameTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                        <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                        <TextBox x:Name="teamDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                        <TextBlock Text="Privacy:" Width="120" VerticalAlignment="Center" TextAlignment="Right"/>
-                                                        <ComboBox x:Name="teamPrivacyComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
+                                        <GroupBox Header="Member Settings">
+                                            <StackPanel Orientation="Horizontal" Margin="30,10">
+                                                <StackPanel Orientation="Vertical" Width="250">
+                                                    <CheckBox x:Name="allowCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
+                                                    <CheckBox x:Name="allowDeleteChannelsCheckBox" Content="Delete Channels"/>
+                                                    <CheckBox x:Name="allowAddRemoveAppsCheckBox" Content="Add/Remove Apps"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                    <CheckBox x:Name="allowCreateUpdateRemoveTabsCheckBox" Content="Create/Update/Remove Tabs"/>
+                                                    <CheckBox x:Name="allowCreateUpdateRemoveConnectorsCheckBox" Content="Create/Update/Remove Connectors"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </GroupBox>
+                                        <GroupBox Header="Guest Settings">
+                                            <StackPanel Orientation="Horizontal" Margin="30,10">
+                                                <StackPanel Orientation="Vertical" Width="250">
+                                                    <CheckBox x:Name="allowGuestCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                    <CheckBox x:Name="allowGuestDeleteChannelsCheckBox" Content="Delete Channels"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </GroupBox>
+                                        <GroupBox Header="Messaging Settings">
+                                            <StackPanel Orientation="Horizontal" Margin="30,10">
+                                                <StackPanel Orientation="Vertical" Width="250">
+                                                    <CheckBox x:Name="allowUserEditMessagesCheckBox" Content="Members Edit Messages"/>
+                                                    <CheckBox x:Name="allowUserDeleteMessagesCheckBox" Content="Members Delete Messages"/>
+                                                    <CheckBox x:Name="allowOwnerDeleteMessagesCheckBox" Content="Owners Delete Messages"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                    <CheckBox x:Name="allowTeamMentionsCheckBox" Content="Team Mentions"/>
+                                                    <CheckBox x:Name="allowChannelMentionsCheckBox" Content="Channel Mentions"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </GroupBox>
+                                        <GroupBox Header="Fun Settings">
+                                            <StackPanel Orientation="Horizontal" Margin="30,10">
+                                                <StackPanel Orientation="Vertical" Width="250">
+                                                    <CheckBox x:Name="allowGiphyCheckBox" Content="Allow Giphy"/>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Label Content="Giphy Rating:"/>
+                                                        <ComboBox x:Name="giphyContentRatingComboBox" MinWidth="100" Margin="5,0,0,0"/>
                                                     </StackPanel>
                                                 </StackPanel>
-                                            </GroupBox>
-                                            <GroupBox Header="Member Settings">
-                                                <StackPanel Orientation="Horizontal" Margin="30,10">
-                                                    <StackPanel Orientation="Vertical" Width="250">
-                                                        <CheckBox x:Name="allowCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
-                                                        <CheckBox x:Name="allowDeleteChannelsCheckBox" Content="Delete Channels"/>
-                                                        <CheckBox x:Name="allowAddRemoveAppsCheckBox" Content="Add/Remove Apps"/>
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
-                                                        <CheckBox x:Name="allowCreateUpdateRemoveTabsCheckBox" Content="Create/Update/Remove Tabs"/>
-                                                        <CheckBox x:Name="allowCreateUpdateRemoveConnectorsCheckBox" Content="Create/Update/Remove Connectors"/>
-                                                    </StackPanel>
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                    <CheckBox x:Name="allowStickersAndMemesCheckBox" Content="Allow Stickers and Memes"/>
+                                                    <CheckBox x:Name="allowCustomMemesCheckBox" Content="Allow Custom Memes"/>
                                                 </StackPanel>
-                                            </GroupBox>
-                                            <GroupBox Header="Guest Settings">
-                                                <StackPanel Orientation="Horizontal" Margin="30,10">
-                                                    <StackPanel Orientation="Vertical" Width="250">
-                                                        <CheckBox x:Name="allowGuestCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
-                                                        <CheckBox x:Name="allowGuestDeleteChannelsCheckBox" Content="Delete Channels"/>
-                                                    </StackPanel>
-                                                </StackPanel>
-                                            </GroupBox>
-                                            <GroupBox Header="Messaging Settings">
-                                                <StackPanel Orientation="Horizontal" Margin="30,10">
-                                                    <StackPanel Orientation="Vertical" Width="250">
-                                                        <CheckBox x:Name="allowUserEditMessagesCheckBox" Content="Members Edit Messages"/>
-                                                        <CheckBox x:Name="allowUserDeleteMessagesCheckBox" Content="Members Delete Messages"/>
-                                                        <CheckBox x:Name="allowOwnerDeleteMessagesCheckBox" Content="Owners Delete Messages"/>
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
-                                                        <CheckBox x:Name="allowTeamMentionsCheckBox" Content="Team Mentions"/>
-                                                        <CheckBox x:Name="allowChannelMentionsCheckBox" Content="Channel Mentions"/>
-                                                    </StackPanel>
-                                                </StackPanel>
-                                            </GroupBox>
-                                            <GroupBox Header="Fun Settings">
-                                                <StackPanel Orientation="Horizontal" Margin="30,10">
-                                                    <StackPanel Orientation="Vertical" Width="250">
-                                                        <CheckBox x:Name="allowGiphyCheckBox" Content="Allow Giphy"/>
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <Label Content="Giphy Rating:"/>
-                                                            <ComboBox x:Name="giphyContentRatingComboBox" MinWidth="100" Margin="5,0,0,0"/>
-                                                        </StackPanel>
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
-                                                        <CheckBox x:Name="allowStickersAndMemesCheckBox" Content="Allow Stickers and Memes"/>
-                                                        <CheckBox x:Name="allowCustomMemesCheckBox" Content="Allow Custom Memes"/>
-                                                    </StackPanel>
-                                                </StackPanel>
-                                            </GroupBox>
+                                            </StackPanel>
+                                        </GroupBox>
 
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,10">
-                                            <Button x:Name="updateTeamButton" Content="Save"/>
-                                            <Button x:Name="refreshTeamButton" Content="Refresh"/>
-                                        </StackPanel>
                                     </StackPanel>
-                                </TabItem>
-                                <TabItem x:Name="teamActionsTabItem" Header="Actions" Width="100" Height="30" >
-                                    <StackPanel Orientation="Vertical" Margin="10">
-                                        <StackPanel Orientation="Horizontal" Margin="5">
-                                            <Button x:Name="deleteTeamButton" Content="Delete"/>
-                                            <TextBlock Text="Delete this Team (and group)" VerticalAlignment="Center" />
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" Margin="5">
-                                            <Button x:Name="archiveTeamButton" Content="Archive"/>
-                                            <TextBlock Text="Archive this Team - Team will become read-only" VerticalAlignment="Center" />
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" Margin="5">
-                                            <Button x:Name="unArchiveTeamButton" Content="Un-Archive"/>
-                                            <TextBlock Text="Un-archive this Team - Team will be restored to full functionality" VerticalAlignment="Center" />
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" Margin="5">
-                                            <Button x:Name="cloneTeamButton" Content="Clone"/>
-                                            <TextBlock Text="Clone this Team" VerticalAlignment="Center" />
-                                        </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,10">
+                                        <Button x:Name="updateTeamButton" Content="Save"/>
+                                        <Button x:Name="refreshTeamButton" Content="Refresh"/>
                                     </StackPanel>
-                                </TabItem>
-                            </TabControl>
-                        </StackPanel>
+                                </StackPanel>
+                            </TabItem>
+                            <TabItem x:Name="teamActionsTabItem" Header="Actions" Width="100" Height="30" >
+                                <StackPanel Orientation="Vertical" Margin="10">
+                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                        <Button x:Name="deleteTeamButton" Content="Delete"/>
+                                        <TextBlock Text="Delete this Team (and group)" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                        <Button x:Name="archiveTeamButton" Content="Archive"/>
+                                        <TextBlock Text="Archive this Team - Team will become read-only" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                        <Button x:Name="unArchiveTeamButton" Content="Un-Archive"/>
+                                        <TextBlock Text="Un-archive this Team - Team will be restored to full functionality" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="5">
+                                        <Button x:Name="cloneTeamButton" Content="Clone"/>
+                                        <TextBlock Text="Clone this Team" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </TabItem>
+                        </TabControl>
                     </StackPanel>
                 </StackPanel>
-            </TabItem>
-        </TabControl>
-    </StackPanel>
+            </StackPanel>
+        </TabItem>
+    </TabControl>
+</StackPanel>
 </Window>
 "@
 
@@ -1033,10 +1033,10 @@ function InvokeGraphAPICall {
 
     }
 
-    # Store any response headers incase they are needed
-    $script:lastAPICallReponseHeaders = $apiCall.Headers
+    # Store any response incase it is needed
+    $script:lastAPICallReponse = $apiCall
 
-    # Return content (asume it's in JSON format)
+    # Return content (assume it's in JSON format)
     if ($apiCall.Content) {
 
         return $apiCall.Content | ConvertFrom-Json  
@@ -1800,9 +1800,20 @@ function AddTeam {
                     # Close Window
                     $window.AddTeamWindow.Close()
         
+                    # Get newly created Team Id
+                    $script:lastAPICallReponse.Headers.Location -match "\/teams\('([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'\)\/operations\('([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'\)"
+                    if ($matches[1]) { $newTeamId = $matches[1] }
+
                     # Refresh Team list
                     ListTeams
 
+                    # If new Team Id, select it
+                    if ($newTeamId) {
+                        
+                        $script:currentTeamId = $newTeamId
+                        GetTeamInformation
+
+                    }
                 }
 
             }
