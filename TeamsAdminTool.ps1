@@ -8,7 +8,7 @@ function LoadMainWindow {
     )
 
     # Declare Objects
-    $script:mainWindow = @{}
+    $script:mainWindow = @{ }
 
     # Load XAML
     [xml]$xaml = @"
@@ -976,10 +976,10 @@ function InvokeGraphAPICall {
             # Get new token using refresh token
             GetAuthTokenUserRefresh
 
-            # Otherwise authenticate without
         }
         else {
 
+            # Otherwise authenticate without
             GetAuthToken
 
         }
@@ -3054,6 +3054,105 @@ function OKPrompt {
 
 }
 
+function TeamsReport {
+    param (
+        
+    )
+
+    # Inpiriation from @MattEllisUC script - https://gist.github.com/moreaboutmatt/9dc6868955b5146ad815b8e044610047
+
+    $teamsReport = @()
+
+    # Save dialog
+    $saveAs = New-Object Microsoft.Win32.SaveFileDialog
+    $saveAs.Filter = "CSV|*.csv"
+    $saveAs.ShowDialog()
+
+    # Get all groups that are Teams
+    $groups = InvokeGraphAPICall -method "GET" -uri "https://graph.microsoft.com/beta/groups?`$filter=resourceProvisioningOptions/Any(x:x eq 'Team')" -silent
+    $totalGroups = (($groups).value).Count
+
+    $groups.value | ForEach-Object {
+
+        # Progress counter
+        $counter++
+
+        # Progress
+        Write-Progress -Activity "Compiling Report" -Status "Processing Team $counter of $totalGroups" -CurrentOperation $_.displayName -PercentComplete (($counter / $totalGroups) * 100)
+
+        # More info from Graph
+        $team = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$($_.id)" -silent
+        $members = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$($_.id)/members" -silent
+        $owners = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$($_.id)/owners" -silent
+        $channels = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$($_.id)/channels" -silent
+
+        $teamsObject = @{
+
+            # General
+            Id                                = $_.id
+            DisplayName                       = $_.displayName
+            Description                       = $_.description
+            Mail                              = $_.mail
+            Visibility                        = $_.visibility
+            CreatedDateTime                   = $_.createdDateTime
+            ExpirationDateTime                = $_.expirationDateTime
+            Archived                          = $team.isArchived
+
+            # Member Settings
+            AllowCreateUpdateChannels         = $team.memberSettings.allowCreateUpdateChannels
+            AllowDeleteChannels               = $team.memberSettings.allowDeleteChannels
+            AllowAddRemoveApps                = $team.memberSettings.allowAddRemoveApps
+            AllowCreateUpdateRemoveTabs       = $team.memberSettings.allowCreateUpdateRemoveTabs
+            AllowCreateUpdateRemoveConnectors = $team.memberSettings.allowCreateUpdateRemoveConnectors
+
+            # Guest Settings
+            AllowGuestCreateUpdateChannels    = $team.guestSettings.allowCreateUpdateChannels
+            AllowGuestDeleteChannels          = $team.guestSettings.allowDeleteChannels
+
+            # Messaging Settings
+            AllowUserEditMessages             = $team.messagingSettings.allowUserEditMessages
+            AllowUserDeleteMessages           = $team.messagingSettings.allowUserDeleteMessages
+            AllowOwnerDeleteMessages          = $team.messagingSettings.allowOwnerDeleteMessages
+            AllowTeamMentions                 = $team.messagingSettings.allowTeamMentions
+            AllowChannelMentions              = $team.messagingSettings.allowChannelMentions
+
+            # Fun Settings
+            AllowGiphy                        = $team.funSettings.allowGiphy
+            GiphyContentRating                = $team.funSettings.giphyContentRating
+            AllowStickersAndMemes             = $team.funSettings.allowStickersAndMemes
+            AllowCustomMemes                  = $team.funSettings.allowCustomMemes
+
+            # Totals
+            NumberChannels                    = (($channels).value).Count
+            NumberOwners                      = (($owners).value).Count
+            NumberMembers                     = (($members).value).Count
+
+        }
+
+        $teamsReport += New-Object PSObject -Property $teamsObject
+
+    }
+
+    # Progress Complete
+    Write-Progress -Activity "Compiling Report" -Completed
+
+    if ($teamsReport) {
+
+        try {
+            
+            $teamsReport | Export-CSV -Path $saveAs.Filename -NoTypeInformation
+            OKPrompt -messageBody "Report completed and saved at $($saveAs.Filename)." -messageTitle "Report Completed"
+
+        } catch {
+
+            ErrorPrompt -messageBody "Unable to save report at $($saveAs.Filename)." -messageTitle "Unable To Save Report"
+
+        }
+
+    }   
+
+}
+
 # Load MainWindow XAML
 LoadMainWindow
 
@@ -3278,6 +3377,13 @@ $script:mainWindow.useSharedAzureADApplicationRadioButton.add_Click( {
 
         # Enable UI
         $script:mainWindow.customAzureADAppStackPanel.IsEnabled = $false
+
+    })
+
+# Report
+$script:mainWindow.teamsReportButton.add_Click( {
+
+        TeamsReport
 
     })
 
