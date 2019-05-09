@@ -1107,6 +1107,8 @@ function InvokeGraphAPICall {
 
             $bodyJson = $body | ConvertTo-Json -Depth 5 | ForEach-Object { [regex]::Unescape($_) }
 
+            Write-Host $bodyJson
+
             Invoke-WebRequest -Method $method -Uri $uri -ContentType $contentType -Headers $Headers -Body $bodyJson -ErrorAction Stop
 
         }
@@ -1754,7 +1756,7 @@ function AddTeam {
                 # Check the bare minumum is valid
                 if ($window.teamNameTextBox.Text -and $window.teamDescriptionTextBox.Text -and $window.teamPrivacyComboBox.SelectedItem) {
 
-                    # Build Channel and Tabs
+                    # Build Channel
                     $channels = @()
                     Foreach ($i in 1..5) {
 
@@ -1762,34 +1764,15 @@ function AddTeam {
                         $currentTeamChannelName = "teamChannelDisplayName$($i)TextBox"
                         $currentTeamChannelDescription = "teamChannelDescription$($i)TextBox"
                         $currentTeamChannelFavourite = "teamChannelFavourite$($i)CheckBox"
-                        $currentTeamChannelWiki = "teamChannelWiki$($i)CheckBox"
 
                         # If channel has a name, let's use it
                         if ($window.$currentTeamChannelName.Text) {
-
-                            $tabs = @()
-
-                            # Wiki Tab
-                            if ($window.$currentTeamChannelWiki.IsChecked -eq $true) {
-
-                                $wikiTab = @{
-
-                                    "teamsApp@odata.bind" = "https://graph.microsoft.com/v1.0/appCatalogs/teamsApps('com.microsoft.teamspace.tab.wiki')"
-                                    name                  = "Setup Wiki"
-
-                                }
-
-                                $tabs += $wikiTab
-
-                            }
 
                             $channel = @{
 
                                 displayName         = $window.$currentTeamChannelName.Text
                                 description         = $window.$currentTeamChannelDescription.Text
                                 isFavoriteByDefault = $window.$currentTeamChannelFavourite.IsChecked
-
-                                tabs                = $tabs
 
                             }
 
@@ -1895,24 +1878,79 @@ function AddTeam {
 
                 # Check if success
                 if ($script:lastAPICallSuccess -eq $true) {
-
-                    OKPrompt -messageBody "Team has been created." -messageTitle "Team Created"
-
-                    # Close Window
-                    $window.AddTeamWindow.Close()
         
                     # Get newly created Team Id
                     $script:lastAPICallReponse.Headers.Location -match "\/teams\('([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'\)\/operations\('([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'\)"
                     if ($matches[1]) { $newTeamId = $matches[1] }
 
-                    # Refresh Team list
-                    ListTeams
-
-                    # If new Team Id, select it
+                    # If new Team Id
                     if ($newTeamId) {
                         
                         $script:currentTeamId = $newTeamId
+
+                        # Get New Team/Group, may need to keep trying as there can be a small delay in creating a Team
+                        while ([string]::IsNullOrEmpty($newTeam)) {
+
+                            $newTeam = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId" -silent
+
+                            Start-Sleep -Seconds 2
+
+                        }
+
+                        # Process Channel Tabs post Team creation e.g. Wiki, OneNote
+                        Foreach ($i in 1..5) {
+
+                            # Channel values requested
+                            $requestedTeamChannelName = "teamChannelDisplayName$($i)TextBox"
+                            $requestedTeamChannelWiki = "teamChannelWiki$($i)CheckBox"
+
+                            # If channel has a name, let's look for it in new Channels
+                            if ($window.$requestedTeamChannelName.Text) {
+
+                                $channel = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels?`$filter=displayName eq '$($window.$requestedTeamChannelName.Text)'"
+
+                                if ($channel.value.id) {
+
+                                    # Set as current channel Id 
+                                    $script:currentChannelId = $channel.value.id
+
+                                    # Wiki Not Checked? - Delete It!
+                                    if ($window.$requestedTeamChannelWiki.IsChecked -eq $false) {
+
+                                        # Get Wiki Tab Id
+                                        $tab = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs?`$filter=displayName eq 'Wiki'"
+
+                                        if ($tab.value.id) {
+
+                                            $script:currentTabId = $tab.value.id
+
+                                            # Remove autocreated Wiki
+                                            InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs/$script:currentTabId"
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+            
+                        }
+                        #>
+
+                        OKPrompt -messageBody "Team has been created." -messageTitle "Team Created"
+
+                        # Close Window
+                        $window.AddTeamWindow.Close()
+
+                        ListTeams
+
                         GetTeamInformation
+
+                    }
+                    else {
+                        
+                        ErrorPrompt -messageBody "Team not created." -messageTitle "Team Creation Failed"
 
                     }
                 }
@@ -3244,7 +3282,8 @@ function TeamsReport {
             $teamsReport | Export-CSV -Path $saveAs.Filename -NoTypeInformation
             OKPrompt -messageBody "Report completed and saved at $($saveAs.Filename)." -messageTitle "Report Completed"
 
-        } catch {
+        }
+        catch {
 
             ErrorPrompt -messageBody "Unable to save report at $($saveAs.Filename)." -messageTitle "Unable To Save Report"
 
