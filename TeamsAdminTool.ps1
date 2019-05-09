@@ -16,7 +16,7 @@ function LoadMainWindow {
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="MainWindow"
-    Title="TeamsAdminTool" Width="1200" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize" FontSize="13.5" 
+    Title="TeamsAdminTool" SizeToContent="WidthAndHeight" FontSize="13.5" Background="#F3F2F1"
 >
 <Window.Resources>
     <Style TargetType="{x:Type Button}">
@@ -259,7 +259,7 @@ function LoadMainWindow {
                             </Label>
                         </Border>
                         <Border Grid.Row="1"
-                        BorderThickness="2"
+                        BorderThickness="1"
                         BorderBrush="#DFDEDE"
                         CornerRadius="3"
                         >
@@ -270,9 +270,101 @@ function LoadMainWindow {
             </Setter.Value>
         </Setter>
     </Style>
+    <Style TargetType="TabItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Grid>
+                        <Border 
+                            CornerRadius="1"
+                            BorderThickness="0"
+                            Background="{TemplateBinding Background}"
+                            >
+                            <ContentPresenter x:Name="TabItemCP" ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="False">
+                            <Setter Property="Background" Value="White"/>
+                            <Setter Property="TextElement.Foreground" Value="#333333" TargetName="TabItemCP" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#E2E2F6" />
+                            <Setter Property="TextElement.Foreground" Value="#333333" TargetName="TabItemCP" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="#BDBDBD" />
+                            <Setter Property="TextElement.Foreground" Value="White" TargetName="TabItemCP" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#6264A7"/>
+                            <Setter Property="TextElement.Foreground" Value="White" TargetName="TabItemCP" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="TabControl">
+        <Setter Property="BorderBrush" Value="#DFDEDE" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style TargetType="{x:Type DataGridRow}">
+        <Setter Property="Foreground" Value="#252424"/>
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Height" Value="30"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#E2E2F6"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#6264A7"/>
+                <Setter Property="Foreground" Value="White" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="{x:Type DataGridCell}">
+        <Setter Property="Foreground" Value="#252424"/>
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type DataGridCell}">
+                    <Border Padding="10,0">
+                        <ContentPresenter VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#6264A7"/>
+                <Setter Property="Foreground" Value="White" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="{x:Type DataGridColumnHeader}">
+        <Setter Property="Foreground" Value="#252424"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                    <Border BorderBrush="#DFDEDE" BorderThickness="1">
+                        <ContentPresenter Margin="10" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type DataGrid}">
+        <Setter Property="BorderBrush" Value="#DFDEDE" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="SelectionUnit" Value="FullRow" />
+        <Setter Property="GridLinesVisibility" Value="None" />
+        <Setter Property="HeadersVisibility" Value="Column" />
+    </Style>
 </Window.Resources>
-<StackPanel>
-    <TabControl x:Name="mainTabControl" Margin="3" BorderBrush="{x:Null}" >
+<StackPanel Margin="10">
+    <TabControl x:Name="mainTabControl" MinWidth="1300" MinHeight="800">
         <TabItem x:Name="connectTabItem" Header="Connect" Width="100" Height="30">
             <StackPanel Orientation="Vertical" Margin="10">
                 <StackPanel Orientation="Vertical" Margin="0,0,0,10">
@@ -331,21 +423,19 @@ function LoadMainWindow {
                     <Button x:Name="teamsRefreshButton" Content="Refresh Teams"/>
                     <Button x:Name="addTeamButton" Content="Add Team"/>
                     <Button x:Name="teamsReportButton" Content="Save Report"/>
-                    <TextBlock Text="Report Type:" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="teamsReportTypeComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="10,0,10,10">
                     <StackPanel Orientation="Vertical">
                         <TextBlock x:Name="totalTeamsTextBlock" Text="Teams (0):" FontSize="20" Margin="5,0,0,5"/>
                         <TextBox x:Name="teamsFilterTextBox"/>
-                        <ListBox x:Name="teamsListBox" Width="220" MaxHeight="735" Margin="4,10"/>
+                        <ListBox x:Name="teamsListBox" Width="220" MaxHeight="640" Margin="4,10"/>
                     </StackPanel>
                     <StackPanel Orientation="Vertical" Margin="10,0,0,0">
                         <StackPanel Orientation="Vertical">
                             <TextBlock x:Name="teamDisplayNameTextBlock" FontSize="24" FontWeight="SemiBold" />
                             <TextBlock x:Name="teamDescriptionTextBlock" FontSize="16" />
                         </StackPanel>
-                        <TabControl x:Name="teamTabControl" Height="750" Width="930" IsEnabled="False" Margin="0,10,0,0">
+                        <TabControl x:Name="teamTabControl" IsEnabled="False" Margin="0,10,0,0" MinWidth="1050" MinHeight="660">
                             <TabItem x:Name="teamOverviewTabItem" Header="Overview" Width="100" Height="30">
                                 <StackPanel Orientation="Vertical"  Margin="10">
                                     <GroupBox Header="Team Overview">
@@ -389,13 +479,13 @@ function LoadMainWindow {
                             <TabItem x:Name="teamMembersTabItem" Header="Members" Width="100" Height="30">
                                 <StackPanel Orientation="Vertical" Margin="10">
                                     <TextBlock x:Name="teamMembersTextBlock" Text="Members (0):" FontSize="16"/>
-                                    <DataGrid x:Name="teamMembersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="265" SelectionMode="Single">
+                                    <DataGrid x:Name="teamMembersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="220" SelectionMode="Single" Width="1025">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
-                                            <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" />
-                                            <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
                                             <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
+                                            <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True" MinWidth="100" Width="Auto"/>
+                                            <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" MinWidth="100" Width="Auto" />
+                                            <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" MinWidth="100" Width="Auto" />
+                                            <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" MinWidth="100" Width="*" />
                                         </DataGrid.Columns>
                                     </DataGrid>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -403,13 +493,13 @@ function LoadMainWindow {
                                         <Button x:Name="removeTeamMemberButton" Content="Remove Member"/>
                                     </StackPanel>
                                     <TextBlock x:Name="teamOwnersTextBlock" Text="Owners (0):" Margin="0,5,0,0" FontSize="16"/>
-                                    <DataGrid x:Name="teamOwnersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="265" SelectionMode="Single">
+                                    <DataGrid x:Name="teamOwnersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="220" SelectionMode="Single" Width="1025">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
-                                            <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" />
-                                            <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
                                             <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
+                                            <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True" MinWidth="100" Width="Auto"/>
+                                            <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" MinWidth="100" Width="Auto"/>
+                                            <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" MinWidth="100" Width="Auto"/>
+                                            <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" MinWidth="100" Width="*"/>
                                         </DataGrid.Columns>
                                     </DataGrid>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -428,8 +518,8 @@ function LoadMainWindow {
                                         <Button x:Name="addChannelButton" Content="Add Channel" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <StackPanel>
-                                        <TabControl x:Name="channelTabControl" Height="619" IsEnabled="False" Margin="0,10,0,0">
-                                            <TabItem x:Name="channelOverviewTabItem" Header="Overview" Width="100">
+                                        <TabControl x:Name="channelTabControl" IsEnabled="False" Margin="0,10,0,0">
+                                            <TabItem x:Name="channelOverviewTabItem" Header="Overview" Width="100" Height="25">
                                                 <StackPanel Orientation="Vertical" Margin="10">
                                                     <GroupBox Header="Channel Overview">
                                                         <StackPanel Orientation="Vertical" Margin="5">
@@ -457,7 +547,7 @@ function LoadMainWindow {
                                                     </GroupBox>
                                                 </StackPanel>
                                             </TabItem>
-                                            <TabItem x:Name="channelTabsTabItem" Header="Tabs" Width="100">
+                                            <TabItem x:Name="channelTabsTabItem" Header="Tabs" Width="100" Height="25">
                                                 <StackPanel Orientation="Vertical" Margin="10">
                                                     <StackPanel Orientation="Horizontal">
                                                         <TextBlock x:Name="channelTabsTextBlock" Text="Tabs (0):" FontSize="16"/>
@@ -471,27 +561,27 @@ function LoadMainWindow {
                                                             <StackPanel Orientation="Vertical" Margin="5">
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
                                                                     <TextBlock Text="Name:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBox x:Name="tabDisplayNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center"/>
+                                                                    <TextBox x:Name="tabDisplayNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="850" VerticalAlignment="Center"/>
                                                                 </StackPanel>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
                                                                     <TextBlock Text="App ID:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBox x:Name="tabTeamsAppIdTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsEnabled="False"/>
+                                                                    <TextBox x:Name="tabTeamsAppIdTextBox" TextWrapping="Wrap" Margin="5,0" Width="850" VerticalAlignment="Center" IsEnabled="False"/>
                                                                 </StackPanel>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
                                                                     <TextBlock Text="Entity ID:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBox x:Name="tabEntityIdTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsEnabled="False"/>
+                                                                    <TextBox x:Name="tabEntityIdTextBox" TextWrapping="Wrap" Margin="5,0" Width="850" VerticalAlignment="Center" IsEnabled="False"/>
                                                                 </StackPanel>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
                                                                     <TextBlock Text="Content URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBox x:Name="tabContentUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsEnabled="False"/>
+                                                                    <TextBox x:Name="tabContentUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="850" VerticalAlignment="Center" IsEnabled="False"/>
                                                                 </StackPanel>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2" >
                                                                     <TextBlock Text="Remove URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBox x:Name="tabRemoveUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsEnabled="False"/>
+                                                                    <TextBox x:Name="tabRemoveUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="850" VerticalAlignment="Center" IsEnabled="False"/>
                                                                 </StackPanel>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
                                                                     <TextBlock Text="Website URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBox x:Name="tabWebsiteUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="750" VerticalAlignment="Center" IsEnabled="False"/>
+                                                                    <TextBox x:Name="tabWebsiteUrlTextBox" TextWrapping="Wrap" Margin="5,0" Width="850" VerticalAlignment="Center" IsEnabled="False"/>
                                                                 </StackPanel>
                                                             </StackPanel>
                                                         </GroupBox>
@@ -502,7 +592,7 @@ function LoadMainWindow {
                                                     </StackPanel>
                                                 </StackPanel>
                                             </TabItem>
-                                            <TabItem x:Name="channelSettingsTabItem" Header="Settings" Width="100" VerticalAlignment="Top">
+                                            <TabItem x:Name="channelSettingsTabItem" Header="Settings" Width="100" Height="25">
                                                 <StackPanel Orientation="Vertical" Margin="10">
                                                     <GroupBox Header="General">
                                                         <StackPanel Orientation="Vertical" Margin="5">
@@ -526,7 +616,7 @@ function LoadMainWindow {
                                                     </StackPanel>
                                                 </StackPanel>
                                             </TabItem>
-                                            <TabItem x:Name="channelActionsTabItem" Header="Actions" Width="100">
+                                            <TabItem x:Name="channelActionsTabItem" Header="Actions" Width="100" Height="25">
                                                 <StackPanel Orientation="Vertical" Margin="10" >
                                                     <StackPanel Orientation="Horizontal" Margin="5">
                                                         <Button x:Name="deleteChannelButton" Content="Delete" />
@@ -562,10 +652,12 @@ function LoadMainWindow {
                                                 <StackPanel Orientation="Vertical" Width="250">
                                                     <CheckBox x:Name="allowCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
                                                     <CheckBox x:Name="allowDeleteChannelsCheckBox" Content="Delete Channels"/>
-                                                    <CheckBox x:Name="allowAddRemoveAppsCheckBox" Content="Add/Remove Apps"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
                                                     <CheckBox x:Name="allowCreateUpdateRemoveTabsCheckBox" Content="Create/Update/Remove Tabs"/>
+                                                    <CheckBox x:Name="allowAddRemoveAppsCheckBox" Content="Add/Remove Apps"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
                                                     <CheckBox x:Name="allowCreateUpdateRemoveConnectorsCheckBox" Content="Create/Update/Remove Connectors"/>
                                                 </StackPanel>
                                             </StackPanel>
@@ -585,11 +677,13 @@ function LoadMainWindow {
                                                 <StackPanel Orientation="Vertical" Width="250">
                                                     <CheckBox x:Name="allowUserEditMessagesCheckBox" Content="Members Edit Messages"/>
                                                     <CheckBox x:Name="allowUserDeleteMessagesCheckBox" Content="Members Delete Messages"/>
-                                                    <CheckBox x:Name="allowOwnerDeleteMessagesCheckBox" Content="Owners Delete Messages"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
                                                     <CheckBox x:Name="allowTeamMentionsCheckBox" Content="Team Mentions"/>
                                                     <CheckBox x:Name="allowChannelMentionsCheckBox" Content="Channel Mentions"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                    <CheckBox x:Name="allowOwnerDeleteMessagesCheckBox" Content="Owners Delete Messages"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </GroupBox>
@@ -604,6 +698,8 @@ function LoadMainWindow {
                                                 </StackPanel>
                                                 <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
                                                     <CheckBox x:Name="allowStickersAndMemesCheckBox" Content="Allow Stickers and Memes"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
                                                     <CheckBox x:Name="allowCustomMemesCheckBox" Content="Allow Custom Memes"/>
                                                 </StackPanel>
                                             </StackPanel>
@@ -644,6 +740,8 @@ function LoadMainWindow {
     </TabControl>
 </StackPanel>
 </Window>
+
+
 "@
 
     # Feed XAML in to XMLNodeReader
@@ -898,6 +996,9 @@ function GetAuthTokenUserRefresh {
     # If token request was a success
     if ($tokenRequest.StatusCode -eq 200) {
 
+        # Set the token timer
+        $script:tokenTimer = Get-Date
+
         return $tokenRequest.Content | ConvertFrom-Json
         
     }
@@ -968,13 +1069,13 @@ function InvokeGraphAPICall {
     # Check token has not expired
     if ($tokenAge.TotalSeconds -gt 3500) {
 
-        Write-Warning "Token Expired!"
+        Write-Warning "Token May Have Expired! Refreshing..."
 
         # If last token issued included a refresh token
         if ($script:issuedToken.refresh_token) {
 
             # Get new token using refresh token
-            GetAuthTokenUserRefresh
+            $script:issuedToken = GetAuthTokenUserRefresh
 
         }
         else {
