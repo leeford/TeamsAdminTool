@@ -41,7 +41,6 @@ TeamsAdminTool allows you to manage many aspects of a Team that cannot currently
 | **Modify a Tab**                   |      Yes       |         No         |        No        |
 | _- Rename Tab_                     |      Yes       |         No         |        No        |
 | **Delete a Tab**                   |      Yes       |         No         |        No        |
-<br />
 
 
 ## How is this done?
