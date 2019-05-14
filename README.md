@@ -2,11 +2,6 @@
 
 _Disclaimer: _
 
-## Introduction
-For a while I've been managing Teams using the Teams Admin Centre and PowerShell module but there have been some tasks I'd like to undertake that were not possible unless I joined the Team I wanted to make a change for. I then started to look what could be acheived using [Microsoft's Graph API](https://docs.microsoft.com/en-gb/graph/api/resources/teams-api-overview?view=graph-rest-beta) and started writing scripts to perform tasks. As the scripts grew it made far more sense to put this in to a tool - and so, _TeamsAdminTool_ was born.
-
-
-
 ## What is it?
 ![TeamsAdminTool](/images/2019-05-14 21_36_41-TeamsAdminTool.png)
 
