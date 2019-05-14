@@ -19,6 +19,156 @@ function LoadMainWindow {
     Title="TeamsAdminTool" SizeToContent="WidthAndHeight" FontSize="13.5" Background="#F3F2F1"
 >
 <Window.Resources>
+    <!-- Inspired from https://stackoverflow.com/questions/22673483/how-do-i-create-a-flat-combo-box-using-wpf -->
+    <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="32" />
+            </Grid.ColumnDefinitions>
+            <Border
+              x:Name="Border" 
+              Grid.ColumnSpan="2"
+              Height="30"
+              CornerRadius="3"
+              BorderBrush="#DFDEDE"
+              Background="White"
+              BorderThickness="1" />
+            <Border 
+              Grid.Column="0"
+              CornerRadius="3,0,0,3" 
+              Margin="1"
+             
+              />
+            <Path 
+              x:Name="Arrow"
+              Grid.Column="1"     
+              Fill="#6264A7"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
+                Width="24"
+                Height="24"/>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="Border" Property="Background" Value="#F3F2F1" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="#DFDEDE" />
+                <Setter Property="Foreground" Value="#252424"/>
+                <Setter TargetName="Arrow" Property="Fill" Value="#DFDEDE" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
+        <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
+    </ControlTemplate>
+    <Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
+        <Setter Property="SnapsToDevicePixels" Value="true"/>
+        <Setter Property="OverridesDefaultStyle" Value="true"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+        <Setter Property="MinWidth" Value="120"/>
+        <Setter Property="MinHeight" Value="20"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ComboBox}">
+                    <Grid>
+                        <ToggleButton 
+                        Name="ToggleButton" 
+                        Template="{StaticResource ComboBoxToggleButton}" 
+                        Grid.Column="2" 
+                        Focusable="false"
+                        IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                        ClickMode="Press">
+                        </ToggleButton>
+                        <ContentPresenter
+                        Name="ContentSite"
+                        IsHitTestVisible="False" 
+                        Content="{TemplateBinding SelectionBoxItem}"
+                        ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                        ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                        Margin="8,3,28,3"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left" />
+                        <TextBox x:Name="PART_EditableTextBox"
+                        Style="{x:Null}" 
+                        Template="{StaticResource ComboBoxTextBox}" 
+                        HorizontalAlignment="Left" 
+                        VerticalAlignment="Center"
+                        Focusable="True" 
+                        Background="Transparent"
+                        Visibility="Hidden"
+                        />
+                        <Popup 
+                        Name="Popup"
+                        Placement="Bottom"
+                        IsOpen="{TemplateBinding IsDropDownOpen}"
+                        AllowsTransparency="True" 
+                        Focusable="False"
+                        PopupAnimation="Slide">
+                            <Grid 
+                              Name="DropDown"
+                              SnapsToDevicePixels="True"                
+                              MinWidth="{TemplateBinding ActualWidth}"
+                              MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                <Border 
+                                x:Name="DropDownBorder"
+                                Background="White"
+                                BorderThickness="1"
+                                BorderBrush="#DFDEDE"
+                                CornerRadius="3"    
+                                    />
+                                <ScrollViewer Margin="0,5" SnapsToDevicePixels="True">
+                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                </ScrollViewer>
+                            </Grid>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasItems" Value="false">
+                            <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
+                        </Trigger>
+                        <Trigger Property="IsGrouping" Value="true">
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                        </Trigger>
+                        <Trigger Property="IsEditable" Value="true">
+                            <Setter Property="IsTabStop" Value="false"/>
+                            <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}">
+        <Setter Property="SnapsToDevicePixels" Value="true"/>
+        <Setter Property="OverridesDefaultStyle" Value="true"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                    <Border 
+                  Name="Border"
+                  Padding="8,5"
+                  SnapsToDevicePixels="true">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="true">
+                            <Setter TargetName="Border" Property="Background" Value="#E2E2F6" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Foreground" Value="#252424"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!---->
     <Style TargetType="{x:Type Button}">
         <Setter Property="Background" Value="#6264A7" />
         <Setter Property="Foreground" Value="White" />
@@ -31,7 +181,6 @@ function LoadMainWindow {
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
                     <Border CornerRadius="3" 
-                            BorderBrush="{TemplateBinding BorderBrush}" 
                             Background="{TemplateBinding Background}"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -53,6 +202,9 @@ function LoadMainWindow {
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+    <Style TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="#252424" />
     </Style>
     <Style TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="#252424" />
@@ -276,8 +428,8 @@ function LoadMainWindow {
                 <ControlTemplate TargetType="TabItem">
                     <Grid>
                         <Border 
-                            CornerRadius="1"
-                            BorderThickness="0"
+                            CornerRadius="3,3,0,0"
+                            BorderThickness="0.5"
                             Background="{TemplateBinding Background}"
                             >
                             <ContentPresenter x:Name="TabItemCP" ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -348,7 +500,7 @@ function LoadMainWindow {
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
-                    <Border BorderBrush="#DFDEDE" BorderThickness="1">
+                    <Border BorderBrush="#DFDEDE" BorderThickness="1,0,1,1">
                         <ContentPresenter Margin="10" VerticalAlignment="Center"/>
                     </Border>
                 </ControlTemplate>
@@ -363,8 +515,8 @@ function LoadMainWindow {
         <Setter Property="HeadersVisibility" Value="Column" />
     </Style>
 </Window.Resources>
-<StackPanel Margin="10">
-    <TabControl x:Name="mainTabControl" MinWidth="1300" MinHeight="800">
+<StackPanel>
+    <TabControl x:Name="mainTabControl" Margin="10">
         <TabItem x:Name="connectTabItem" Header="Connect" Width="100" Height="30">
             <StackPanel Orientation="Vertical" Margin="10">
                 <StackPanel Orientation="Vertical" Margin="0,0,0,10">
@@ -422,7 +574,7 @@ function LoadMainWindow {
                 <StackPanel Orientation="Horizontal" Margin="10">
                     <Button x:Name="teamsRefreshButton" Content="Refresh Teams"/>
                     <Button x:Name="addTeamButton" Content="Add Team"/>
-                    <Button x:Name="teamsReportButton" Content="Save Report"/>
+                    <Button x:Name="teamsReportButton" Content="Teams Report"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="10,0,10,10">
                     <StackPanel Orientation="Vertical">
@@ -476,7 +628,7 @@ function LoadMainWindow {
                                     </GroupBox>
                                 </StackPanel>
                             </TabItem>
-                            <TabItem x:Name="teamMembersTabItem" Header="Members" Width="100" Height="30">
+                            <TabItem x:Name="teamMembersTabItem" Header="Membership" Width="100" Height="30">
                                 <StackPanel Orientation="Vertical" Margin="10">
                                     <TextBlock x:Name="teamMembersTextBlock" Text="Members (0):" FontSize="16"/>
                                     <DataGrid x:Name="teamMembersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="220" SelectionMode="Single" Width="1025">
@@ -540,7 +692,7 @@ function LoadMainWindow {
                                                                 <TextBlock x:Name="totalChannelTabsTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
                                                             </StackPanel>
                                                             <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                <TextBlock Text="Favourite By Default:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="Favourite:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
                                                                 <CheckBox x:Name="channelIsFavouriteByDefault1CheckBox" Margin="5,0" IsHitTestVisible="False" Focusable="False" VerticalAlignment="Center"/>
                                                             </StackPanel>
                                                         </StackPanel>
@@ -605,7 +757,7 @@ function LoadMainWindow {
                                                                 <TextBox x:Name="channelDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
                                                             </StackPanel>
                                                             <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                                <TextBlock Text="Favourite By Default:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="Favourite:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
                                                                 <CheckBox x:Name="channelIsFavouriteByDefault2CheckBox" Margin="5,0" VerticalAlignment="Center"/>
                                                             </StackPanel>
                                                         </StackPanel>
@@ -649,62 +801,68 @@ function LoadMainWindow {
                                         </GroupBox>
                                         <GroupBox Header="Member Settings">
                                             <StackPanel Orientation="Horizontal" Margin="30,10">
-                                                <StackPanel Orientation="Vertical" Width="250">
+                                                <StackPanel Orientation="Vertical" Width="300">
                                                     <CheckBox x:Name="allowCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
                                                     <CheckBox x:Name="allowDeleteChannelsCheckBox" Content="Delete Channels"/>
                                                 </StackPanel>
-                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="300">
                                                     <CheckBox x:Name="allowCreateUpdateRemoveTabsCheckBox" Content="Create/Update/Remove Tabs"/>
                                                     <CheckBox x:Name="allowAddRemoveAppsCheckBox" Content="Add/Remove Apps"/>
                                                 </StackPanel>
-                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="300">
                                                     <CheckBox x:Name="allowCreateUpdateRemoveConnectorsCheckBox" Content="Create/Update/Remove Connectors"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </GroupBox>
                                         <GroupBox Header="Guest Settings">
                                             <StackPanel Orientation="Horizontal" Margin="30,10">
-                                                <StackPanel Orientation="Vertical" Width="250">
+                                                <StackPanel Orientation="Vertical" Width="300">
                                                     <CheckBox x:Name="allowGuestCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
                                                 </StackPanel>
-                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="300">
                                                     <CheckBox x:Name="allowGuestDeleteChannelsCheckBox" Content="Delete Channels"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </GroupBox>
                                         <GroupBox Header="Messaging Settings">
                                             <StackPanel Orientation="Horizontal" Margin="30,10">
-                                                <StackPanel Orientation="Vertical" Width="250">
+                                                <StackPanel Orientation="Vertical" Width="300">
                                                     <CheckBox x:Name="allowUserEditMessagesCheckBox" Content="Members Edit Messages"/>
                                                     <CheckBox x:Name="allowUserDeleteMessagesCheckBox" Content="Members Delete Messages"/>
                                                 </StackPanel>
-                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="300">
                                                     <CheckBox x:Name="allowTeamMentionsCheckBox" Content="Team Mentions"/>
                                                     <CheckBox x:Name="allowChannelMentionsCheckBox" Content="Channel Mentions"/>
                                                 </StackPanel>
-                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="300">
                                                     <CheckBox x:Name="allowOwnerDeleteMessagesCheckBox" Content="Owners Delete Messages"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </GroupBox>
                                         <GroupBox Header="Fun Settings">
                                             <StackPanel Orientation="Horizontal" Margin="30,10">
-                                                <StackPanel Orientation="Vertical" Width="250">
+                                                <StackPanel Orientation="Vertical" Width="300">
                                                     <CheckBox x:Name="allowGiphyCheckBox" Content="Allow Giphy"/>
                                                     <StackPanel Orientation="Horizontal">
                                                         <Label Content="Giphy Rating:"/>
                                                         <ComboBox x:Name="giphyContentRatingComboBox" MinWidth="100" Margin="5,0,0,0"/>
                                                     </StackPanel>
                                                 </StackPanel>
-                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="300">
                                                     <CheckBox x:Name="allowStickersAndMemesCheckBox" Content="Allow Stickers and Memes"/>
                                                 </StackPanel>
-                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="250">
+                                                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Width="300">
                                                     <CheckBox x:Name="allowCustomMemesCheckBox" Content="Allow Custom Memes"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </GroupBox>
-
+                                        <GroupBox Header="Discovery Settings">
+                                            <StackPanel Orientation="Horizontal" Margin="30,10">
+                                                <StackPanel Orientation="Vertical" Width="300">
+                                                    <CheckBox x:Name="showInTeamsSearchAndSuggestionsCheckBox" Content="Show In Teams Search and Suggestions"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </GroupBox>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,10">
                                         <Button x:Name="updateTeamButton" Content="Save"/>
@@ -740,8 +898,6 @@ function LoadMainWindow {
     </TabControl>
 </StackPanel>
 </Window>
-
-
 "@
 
     # Feed XAML in to XMLNodeReader
@@ -772,6 +928,9 @@ function GetAuthToken {
     # Reset Auth Token
     $script:issuedToken = $null
 
+    # Reset Logged In User
+    $script:me = $null
+
     # Shared (multitenant) Azure AD App checked
     if ($script:mainWindow.useSharedAzureADApplicationRadioButton.IsChecked -eq $true) {
         
@@ -781,6 +940,17 @@ function GetAuthToken {
 
         # Get Issued Token for User
         $script:issuedToken = GetAuthTokenUser
+
+        # If there is an issued token
+        if ($script:issuedToken.access_token) {
+
+            # Set the token timer
+            $script:tokenTimer = Get-Date
+            
+            # Get Logged in User
+            $script:me = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/v1.0/me"
+            
+        }
     
     }
     # Custom Azure AD App checked
@@ -802,6 +972,19 @@ function GetAuthToken {
 
                 # Get Issued Token for User
                 $script:issuedToken = GetAuthTokenUser
+
+                # If there is an issued token
+                if ($script:issuedToken.access_token) {
+
+                    # Set the token timer
+                    $script:tokenTimer = Get-Date
+
+                    # Get Logged in User
+                    $script:me = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/v1.0/me"
+
+                }
+
+                
 
             }
             else {
@@ -825,6 +1008,14 @@ function GetAuthToken {
                 # Get Issued Token for Application
                 $script:issuedToken = GetAuthTokenApplication
 
+                # If there is an issued token
+                if ($script:issuedToken.access_token) {
+
+                    # Set the token timer
+                    $script:tokenTimer = Get-Date
+
+                }
+
             }
             else {
 
@@ -836,13 +1027,6 @@ function GetAuthToken {
 
     }
 
-    # If there is an issued token
-    if ($script:issuedToken.access_token) {
-
-        # Set the token timer
-        $script:tokenTimer = Get-Date
-
-    }
 
 }
 
@@ -1071,7 +1255,7 @@ function InvokeGraphAPICall {
 
         Write-Warning "Token May Have Expired! Refreshing..."
 
-        # If last token issued included a refresh token
+        # If last token issued included a refresh token (user)
         if ($script:issuedToken.refresh_token) {
 
             # Get new token using refresh token
@@ -1106,8 +1290,6 @@ function InvokeGraphAPICall {
         if ($body -and $method -ne "GET") {
 
             $bodyJson = $body | ConvertTo-Json -Depth 5 | ForEach-Object { [regex]::Unescape($_) }
-
-            Write-Host $bodyJson
 
             Invoke-WebRequest -Method $method -Uri $uri -ContentType $contentType -Headers $Headers -Body $bodyJson -ErrorAction Stop
 
@@ -1211,6 +1393,8 @@ function GetTeamInformation {
         $script:mainWindow.giphyContentRatingComboBox.SelectedItem = (Get-Culture).TextInfo.ToTitleCase($team.funSettings.giphyContentRating)
         $script:mainWindow.allowStickersAndMemesCheckBox.IsChecked = $team.funSettings.allowStickersAndMemes
         $script:mainWindow.allowCustomMemesCheckBox.IsChecked = $team.funSettings.allowCustomMemes
+        # Discover
+        $script:mainWindow.showInTeamsSearchAndSuggestionsCheckBox.IsChecked = $team.discoverySettings.showInTeamsSearchAndSuggestions
 
         # Group #
         #########
@@ -1508,13 +1692,392 @@ function AddTeam {
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="AddTeamWindow"
-    Title="Add Team" Width="640" SizeToContent="Height" FontSize="13"
+    Title="Add Team" MinWidth="640" SizeToContent="WidthAndHeight" FontSize="13.5"
     >
+    <Window.Resources>
+        <Style TargetType="{x:Type DataGridRow}">
+            <Setter Property="Foreground" Value="#252424"/>
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Height" Value="30"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E2E2F6"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#6264A7"/>
+                    <Setter Property="Foreground" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type DataGridCell}">
+            <Setter Property="Foreground" Value="#252424"/>
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Border Padding="10,0">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#6264A7"/>
+                    <Setter Property="Foreground" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Foreground" Value="#252424"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                        <Border BorderBrush="#DFDEDE" BorderThickness="1,0,1,1">
+                            <ContentPresenter Margin="10" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="BorderBrush" Value="#DFDEDE" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="SelectionUnit" Value="FullRow" />
+            <Setter Property="GridLinesVisibility" Value="None" />
+            <Setter Property="HeadersVisibility" Value="Column" />
+        </Style>
+        <!-- Inspired from https://stackoverflow.com/questions/22673483/how-do-i-create-a-flat-combo-box-using-wpf -->
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="32" />
+                </Grid.ColumnDefinitions>
+                <Border
+                  x:Name="Border" 
+                  Grid.ColumnSpan="2"
+                  Height="30"
+                  CornerRadius="3"
+                  BorderBrush="#DFDEDE"
+                  Background="White"
+                  BorderThickness="1" />
+                <Border 
+                  Grid.Column="0"
+                  CornerRadius="3,0,0,3" 
+                  Margin="1"
+                 
+                  />
+                <Path 
+                  x:Name="Arrow"
+                  Grid.Column="1"     
+                  Fill="#6264A7"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
+                    Width="24"
+                    Height="24"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter TargetName="Border" Property="Background" Value="#F3F2F1" />
+                    <Setter TargetName="Border" Property="BorderBrush" Value="#DFDEDE" />
+                    <Setter Property="Foreground" Value="#252424"/>
+                    <Setter TargetName="Arrow" Property="Fill" Value="#DFDEDE" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
+            <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
+        </ControlTemplate>
+        <Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="MinWidth" Value="120"/>
+            <Setter Property="MinHeight" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton 
+                            Name="ToggleButton" 
+                            Template="{StaticResource ComboBoxToggleButton}" 
+                            Grid.Column="2" 
+                            Focusable="false"
+                            IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                            ClickMode="Press">
+                            </ToggleButton>
+                            <ContentPresenter
+                            Name="ContentSite"
+                            IsHitTestVisible="False" 
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                            Margin="8,3,28,3"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left" />
+                            <TextBox x:Name="PART_EditableTextBox"
+                            Style="{x:Null}" 
+                            Template="{StaticResource ComboBoxTextBox}" 
+                            HorizontalAlignment="Left" 
+                            VerticalAlignment="Center"
+                            Focusable="True" 
+                            Background="Transparent"
+                            Visibility="Hidden"
+                            />
+                            <Popup 
+                            Name="Popup"
+                            Placement="Bottom"
+                            IsOpen="{TemplateBinding IsDropDownOpen}"
+                            AllowsTransparency="True" 
+                            Focusable="False"
+                            PopupAnimation="Slide">
+                                <Grid 
+                                  Name="DropDown"
+                                  SnapsToDevicePixels="True"                
+                                  MinWidth="{TemplateBinding ActualWidth}"
+                                  MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border 
+                                    x:Name="DropDownBorder"
+                                    Background="White"
+                                    BorderThickness="1"
+                                    BorderBrush="#DFDEDE"
+                                    CornerRadius="3"    
+                                        />
+                                    <ScrollViewer Margin="0,5" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
+                            </Trigger>
+                            <Trigger Property="IsGrouping" Value="true">
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable" Value="true">
+                                <Setter Property="IsTabStop" Value="false"/>
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border 
+                      Name="Border"
+                      Padding="8,5"
+                      SnapsToDevicePixels="true">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#E2E2F6" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#252424"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!---->
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#6264A7" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="MinWidth" Value="100" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="3" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#464775" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#33344A" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#BDBDBD" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="#252424" />
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Foreground" Value="#252424" />
+            <Setter Property="BorderBrush" Value="#DFDEDE" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border CornerRadius="3" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                        >
+                            <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#6264A7" />
+                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type RadioButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Grid Height="20" Width="20">
+                                    <Border Name="Outer" Background="Transparent" BorderBrush="#DFDEDE" BorderThickness="2" CornerRadius="3" />
+                                    <Border Name="Mark" CornerRadius="2" Margin="5" Visibility="Hidden" />
+                                </Grid>
+                            </BulletDecorator.Bullet>
+                            <TextBlock Margin="5,0" Foreground="#252424" VerticalAlignment="Center">
+                            <ContentPresenter />
+                            </TextBlock>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Mark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="Outer" Property="BorderBrush" Value="#E2E2F6" />
+                                <Setter TargetName="Mark" Property="Background" Value="#E2E2F6" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Mark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="Outer" Property="BorderBrush" Value="#6264A7" />
+                                <Setter TargetName="Mark" Property="Background" Value="#6264A7" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Outer" Property="BorderBrush" Value="#DFDEDE" />
+                                <Setter TargetName="Mark" Property="Background" Value="#DFDEDE" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Grid Height="24" Width="24">
+                                    <Border Name="Outer" Background="Transparent" BorderBrush="#DFDEDE" BorderThickness="2" CornerRadius="3" Margin="2"/>
+                                    <Border Name="CheckMark" Visibility="Hidden" >
+                                        <Path
+                                        x:Name="CheckMarkPath"
+                                        Width="24" Height="24"
+                                        SnapsToDevicePixels="False"
+                                        StrokeThickness="2"
+                                        Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                                    </Border>
+                                </Grid>
+                            </BulletDecorator.Bullet>
+                            <TextBlock Margin="5,0" Foreground="#252424" VerticalAlignment="Center">
+                            <ContentPresenter />
+                            </TextBlock>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#E2E2F6" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#6264A7" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#DFDEDE" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0">
+                                <Label Foreground="#252424"
+                                       FontSize="16">
+                                    <ContentPresenter ContentSource="Header"/>
+                                </Label>
+                            </Border>
+                            <Border Grid.Row="1"
+                            BorderThickness="1"
+                            BorderBrush="#DFDEDE"
+                            CornerRadius="3"
+                            >
+                                <ContentPresenter />
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Vertical" Margin="10,0">
             <GroupBox Header="Standard Team" Margin="0,5">
-                <StackPanel>
-                    <RadioButton x:Name="standardTeamRadioButton" Content="Create a Standard Team" GroupName="teamType" IsChecked="True" Margin="0,10,0,0"/>
+                <StackPanel Orientation="Vertical" Margin="10">
+                    <RadioButton x:Name="standardTeamRadioButton" Content="Create a Standard Team" GroupName="teamType" IsChecked="True" Margin="0,10"/>
                     <Expander Header="General" IsExpanded="True">
                         <StackPanel Orientation="Vertical" Margin="5">
                             <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -1529,9 +2092,10 @@ function AddTeam {
                                 <TextBlock Text="Privacy:" Width="120" VerticalAlignment="Center" TextAlignment="Right"/>
                                 <ComboBox x:Name="teamPrivacyComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock Text="Owner:" Width="120" VerticalAlignment="Top" TextAlignment="Right"/>
-                                <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Vertical" Margin="0,2">
+                                
+                                    <TextBlock Text="Owner:" Width="120" HorizontalAlignment="Left" TextAlignment="Right" Margin="0,5"/>
+                                    <StackPanel Orientation="Vertical">
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
                                         <TextBlock Text="User (UPN):" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
                                         <TextBox x:Name="userTextBox" TextWrapping="Wrap" Margin="5,0" Width="350"/>
@@ -1549,7 +2113,7 @@ function AddTeam {
                                         <TextBlock x:Name="userLocationTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <Button x:Name="addTeamOwnerButton" Content="Add" Width="60" Margin="5,0" IsEnabled="False"/>
+                                        <Button x:Name="addTeamOwnerButton" Content="Add Owner" Margin="5,0" IsEnabled="False"/>
                                     </StackPanel>
                                     <DataGrid x:Name="teamOwnersDataGrid" AutoGenerateColumns="False" Margin="0,5" MinHeight="50" SelectionMode="Single" AlternatingRowBackground="#FFE5E5F1" AlternationCount="2" GridLinesVisibility="None">
                                         <DataGrid.Columns>
@@ -1560,7 +2124,8 @@ function AddTeam {
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </StackPanel>
-                            </StackPanel>
+                                </StackPanel>
+                                
                         </StackPanel>
                     </Expander>
                     <Expander Header="Additional Channels">
@@ -1597,6 +2162,14 @@ function AddTeam {
                                     <CheckBox x:Name="teamChannelWiki3CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
                                     <CheckBox x:Name="teamChannelWiki4CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
                                     <CheckBox x:Name="teamChannelWiki5CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Margin="5,0,0,0">
+                                    <Label Content="OneNote:"/>
+                                    <CheckBox x:Name="teamChannelOneNote1CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                    <CheckBox x:Name="teamChannelOneNote2CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                    <CheckBox x:Name="teamChannelOneNote3CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                    <CheckBox x:Name="teamChannelOneNote4CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                    <CheckBox x:Name="teamChannelOneNote5CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
@@ -1652,6 +2225,13 @@ function AddTeam {
                             </StackPanel>
                         </StackPanel>
                     </Expander>
+                    <Expander Header="Discovery Settings">
+                        <StackPanel Orientation="Horizontal" Margin="30,10">
+                            <StackPanel Orientation="Vertical">
+                                <CheckBox x:Name="showInTeamsSearchAndSuggestionsCheckBox" Content="Show In Teams Search and Suggestions" IsChecked="True" IsEnabled="False"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander>
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Custom Team" Margin="0,5">
@@ -1666,8 +2246,8 @@ function AddTeam {
             </GroupBox>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="addTeamButton" Content="Add" Margin="10" Width="100"/>
-            <Button x:Name="cancelButton" Content="Cancel" Margin="10" Width="100"/>
+            <Button x:Name="addTeamButton" Content="Add" Margin="10"/>
+            <Button x:Name="cancelButton" Content="Cancel" Margin="10"/>
         </StackPanel>
     </StackPanel>
 </Window>
@@ -1694,7 +2274,7 @@ function AddTeam {
     # Privacy
     $privacyOptions = @("Private", "Public") | Sort-Object
     $window.teamPrivacyComboBox.ItemsSource = $privacyOptions
-    $window.teamPrivacyComboBox.SelectedItem = "Private"
+    $window.teamPrivacyComboBox.SelectedItem = "Public"
     # Giphy
     $giphyOptions = @("Strict", "Moderate") | Sort-Object
     $window.giphyContentRatingComboBox.ItemsSource = $giphyOptions
@@ -1706,6 +2286,29 @@ function AddTeam {
 
             # Close Window
             $window.AddTeamWindow.Close()
+
+        })
+
+    # Team Visibility Changed
+    $window.teamPrivacyComboBox.add_SelectionChanged( {
+
+            # Change discovery settings based on visibility
+            if ($window.teamPrivacyComboBox.SelectedItem -eq "Public") {
+            
+                # Enable discovery
+                $window.showInTeamsSearchAndSuggestionsCheckBox.IsChecked = $true
+                # Disable Checkbox
+                $window.showInTeamsSearchAndSuggestionsCheckBox.IsEnabled = $false
+
+            }
+            elseif ($window.teamPrivacyComboBox.SelectedItem -eq "Private") {
+
+                # Disable discovery
+                $window.showInTeamsSearchAndSuggestionsCheckBox.IsChecked = $false
+                # Enable Checkbox
+                $window.showInTeamsSearchAndSuggestionsCheckBox.IsEnabled = $true
+
+            }
 
         })
 
@@ -1754,7 +2357,7 @@ function AddTeam {
             if ($window.standardTeamRadioButton.IsChecked -eq $true) {
 
                 # Check the bare minumum is valid
-                if ($window.teamNameTextBox.Text -and $window.teamDescriptionTextBox.Text -and $window.teamPrivacyComboBox.SelectedItem) {
+                if ($window.teamNameTextBox.Text -and $window.teamPrivacyComboBox.SelectedItem) {
 
                     # Build Channel
                     $channels = @()
@@ -1840,6 +2443,13 @@ function AddTeam {
 
                         }
 
+                        # Discovery Settings
+                        discoverySettings     = @{
+
+                            showInTeamsSearchAndSuggestions = $window.showInTeamsSearchAndSuggestionsCheckBox.IsChecked
+
+                        }
+
                         # Channels
                         channels              = $channels
 
@@ -1848,7 +2458,7 @@ function AddTeam {
                 }
                 else {
 
-                    ErrorPrompt -messageBody "Not all fields are complete. Ensure the Team has a name, a description and an owner." -messageTitle "Incomplete"
+                    ErrorPrompt -messageBody "Not all fields are complete. Ensure the Team has a name and an owner." -messageTitle "Incomplete"
 
                 }
 
@@ -1859,7 +2469,7 @@ function AddTeam {
                 # If text in JSON text box
                 if ($window.customJSONTextBox.Text) {
 
-                    $body = $window.customJSONTextBox.Text
+                    $body = $window.customJSONTextBox.Text | ConvertFrom-Json
 
                 }
                 else {
@@ -1900,14 +2510,22 @@ function AddTeam {
                         # Process Channel Tabs post Team creation e.g. Wiki, OneNote
                         Foreach ($i in 1..5) {
 
-                            # Channel values requested
                             $requestedTeamChannelName = "teamChannelDisplayName$($i)TextBox"
                             $requestedTeamChannelWiki = "teamChannelWiki$($i)CheckBox"
+                            $requestedTeamChannelOneNote = "teamChannelOneNote$($i)CheckBox"
+                            $script:currentChannelId = $null
+                            $channel = $null
 
-                            # If channel has a name, let's look for it in new Channels
-                            if ($window.$requestedTeamChannelName.Text) {
+                            # If channel has a name, let's look for it in created Channels
+                            if (-not [string]::IsNullOrEmpty($window.$requestedTeamChannelName.Text)) {
 
-                                $channel = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels?`$filter=displayName eq '$($window.$requestedTeamChannelName.Text)'"
+                                while ([string]::IsNullOrEmpty($channel.value.id)) {
+
+                                    $channel = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels?`$filter=displayName eq '$($window.$requestedTeamChannelName.Text)'"
+        
+                                    Start-Sleep -Seconds 2
+        
+                                }
 
                                 if ($channel.value.id) {
 
@@ -1917,17 +2535,14 @@ function AddTeam {
                                     # Wiki Not Checked? - Delete It!
                                     if ($window.$requestedTeamChannelWiki.IsChecked -eq $false) {
 
-                                        # Get Wiki Tab Id
-                                        $tab = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs?`$filter=displayName eq 'Wiki'"
+                                        RemoveWikiTab
 
-                                        if ($tab.value.id) {
+                                    }
 
-                                            $script:currentTabId = $tab.value.id
+                                    # OneNote Checked? - Create It!
+                                    if ($window.$requestedTeamChannelOneNote.IsChecked -eq $true) {
 
-                                            # Remove autocreated Wiki
-                                            InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs/$script:currentTabId"
-
-                                        }
+                                        AddOneNoteTab -notebookName $window.$requestedTeamChannelName.Text -tabName "OneNote"
 
                                     }
 
@@ -1936,7 +2551,7 @@ function AddTeam {
                             }
             
                         }
-                        #>
+                        
 
                         OKPrompt -messageBody "Team has been created." -messageTitle "Team Created"
 
@@ -2135,6 +2750,23 @@ function UpdateTeam {
 
         }
 
+        # If Team is set to Private, update discovery settings too
+        if ($script:mainWindow.teamPrivacyComboBox.SelectedItem -eq "Private") {
+
+            $discoverySettings = @{
+
+                discoverySettings = @{
+
+                    showInTeamsSearchAndSuggestions = $script:mainWindow.showInTeamsSearchAndSuggestionsCheckBox.IsChecked
+
+                }                
+
+            }
+
+            $teamBody += $discoverySettings
+            
+        }
+
     }
     else {
 
@@ -2147,6 +2779,9 @@ function UpdateTeam {
 
         # Update Group
         InvokeGraphAPICall -method "PATCH" -uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId" -body $groupBody
+
+        # Pause for a second or two
+        Start-Sleep -Seconds 2
 
         # Update Team
         InvokeGraphAPICall -method "PATCH" -uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId" -body $teamBody
@@ -2210,8 +2845,272 @@ function CloneTeam {
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="CloneTeamWindow"
-    Title="Clone Team" Width="420" SizeToContent="Height" FontSize="13.5"
+    Title="Clone Team" SizeToContent="WidthAndHeight" FontSize="13.5"
     >
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#6264A7" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="MinWidth" Value="100" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="3" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#464775" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#33344A" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#BDBDBD" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="#252424" />
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Foreground" Value="#252424" />
+            <Setter Property="BorderBrush" Value="#DFDEDE" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border CornerRadius="3" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                        >
+                            <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#6264A7" />
+                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- Inspired from https://stackoverflow.com/questions/22673483/how-do-i-create-a-flat-combo-box-using-wpf -->
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="32" />
+                </Grid.ColumnDefinitions>
+                <Border
+                  x:Name="Border" 
+                  Grid.ColumnSpan="2"
+                  Height="30"
+                  CornerRadius="3"
+                  BorderBrush="#DFDEDE"
+                  Background="White"
+                  BorderThickness="1" />
+                <Border 
+                  Grid.Column="0"
+                  CornerRadius="3,0,0,3" 
+                  Margin="1"
+                 
+                  />
+                <Path 
+                  x:Name="Arrow"
+                  Grid.Column="1"     
+                  Fill="#6264A7"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
+                    Width="24"
+                    Height="24"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter TargetName="Border" Property="Background" Value="#F3F2F1" />
+                    <Setter TargetName="Border" Property="BorderBrush" Value="#DFDEDE" />
+                    <Setter Property="Foreground" Value="#252424"/>
+                    <Setter TargetName="Arrow" Property="Fill" Value="#DFDEDE" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
+            <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
+        </ControlTemplate>
+        <Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="MinWidth" Value="120"/>
+            <Setter Property="MinHeight" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton 
+                            Name="ToggleButton" 
+                            Template="{StaticResource ComboBoxToggleButton}" 
+                            Grid.Column="2" 
+                            Focusable="false"
+                            IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                            ClickMode="Press">
+                            </ToggleButton>
+                            <ContentPresenter
+                            Name="ContentSite"
+                            IsHitTestVisible="False" 
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                            Margin="8,3,28,3"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left" />
+                            <TextBox x:Name="PART_EditableTextBox"
+                            Style="{x:Null}" 
+                            Template="{StaticResource ComboBoxTextBox}" 
+                            HorizontalAlignment="Left" 
+                            VerticalAlignment="Center"
+                            Focusable="True" 
+                            Background="Transparent"
+                            Visibility="Hidden"
+                            />
+                            <Popup 
+                            Name="Popup"
+                            Placement="Bottom"
+                            IsOpen="{TemplateBinding IsDropDownOpen}"
+                            AllowsTransparency="True" 
+                            Focusable="False"
+                            PopupAnimation="Slide">
+                                <Grid 
+                                  Name="DropDown"
+                                  SnapsToDevicePixels="True"                
+                                  MinWidth="{TemplateBinding ActualWidth}"
+                                  MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border 
+                                    x:Name="DropDownBorder"
+                                    Background="White"
+                                    BorderThickness="1"
+                                    BorderBrush="#DFDEDE"
+                                    CornerRadius="3"    
+                                        />
+                                    <ScrollViewer Margin="0,5" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
+                            </Trigger>
+                            <Trigger Property="IsGrouping" Value="true">
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable" Value="true">
+                                <Setter Property="IsTabStop" Value="false"/>
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border 
+                      Name="Border"
+                      Padding="8,5"
+                      SnapsToDevicePixels="true">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#E2E2F6" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#252424"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!---->
+                <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Grid Height="24" Width="24">
+                                    <Border Name="Outer" Background="Transparent" BorderBrush="#DFDEDE" BorderThickness="2" CornerRadius="3" Margin="2"/>
+                                    <Border Name="CheckMark" Visibility="Hidden" >
+                                        <Path
+                                        x:Name="CheckMarkPath"
+                                        Width="24" Height="24"
+                                        SnapsToDevicePixels="False"
+                                        StrokeThickness="2"
+                                        Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                                    </Border>
+                                </Grid>
+                            </BulletDecorator.Bullet>
+                            <TextBlock Margin="5,0" Foreground="#252424" VerticalAlignment="Center">
+                            <ContentPresenter />
+                            </TextBlock>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#E2E2F6" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#6264A7" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#DFDEDE" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <StackPanel Orientation="Vertical" Margin="10,0">
         <StackPanel Orientation="Vertical" Margin="5">
             
@@ -2299,7 +3198,7 @@ function CloneTeam {
     $window.cloneTeamButton.add_Click( {
 
             # Check the bare minumum is valid
-            if ($window.teamNameTextBox.Text -and $window.teamDescriptionTextBox.Text -and $window.teamPrivacyComboBox.SelectedItem -and $window.mailNicknameTextBox.Text) {
+            if ($window.teamNameTextBox.Text -and $window.teamPrivacyComboBox.SelectedItem -and $window.mailNicknameTextBox.Text) {
 
                 # Collect options selected
                 $options = @()
@@ -2348,28 +3247,103 @@ function CloneTeam {
             }
             else {
 
-                ErrorPrompt -messageBody "Not all fields are complete. Ensure the Team has a name, a description and mail nickname." -messageTitle "Incomplete"
+                ErrorPrompt -messageBody "Not all fields are complete. Ensure the Team has a name and a mail nickname." -messageTitle "Incomplete"
 
             }
 
             # If JSON body is available
             if ($body) {
 
+                # If using user permissions, if not already a member, temporarily add logged in user to the group (as membership is required to clone a Team)
+                if ($script:me.id) {
+
+                    # Check if already a member or not
+                    $alreadyMember = checkIfMember
+                    $alreadyOwner = checkIfOwner
+            
+                }
+
+                # Get members and owners of Team to be cloned as members and owners sometimes don't clone properly and we can add back in after cloning
+                $members = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members"
+                $owners = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/owners"
+
+                # Cloned Team ID
+                $clonedTeamId = $script:currentTeamId
+
                 # Clone Team
                 InvokeGraphAPICall -method "POST" -uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/clone" -body $body
 
-                # Check if success
-                if ($script:lastAPICallSuccess -eq $true) {
+                # Get newly created Team Id
+                $script:lastAPICallReponse.Headers.Location -match "\/teams\('([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'\)\/operations\('([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'\)"
+                if ($matches[1]) { $newTeamId = $matches[1] }
 
-                    OKPrompt -messageBody "Team has been cloned. It may take a few minutes to appear." -messageTitle "Team Cloned"
+                # If new Team Id
+                if ($newTeamId) {
 
-                }                
+                    $script:currentTeamId = $newTeamId
+
+                    # Get New Team/Group, may need to keep trying as there can be a small delay in creating a Team
+                    while ([string]::IsNullOrEmpty($newTeam)) {
+
+                        $newTeam = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId" -silent
+
+                        Start-Sleep -Seconds 2
+
+                    }
+
+                    # Add owners and members back in to Team (just in case) if required
+                    if ($window.cloneMembersCheckBox.IsChecked -eq $true) {
+                        
+                    
+                        $members.value | ForEach-Object {
+
+                            $body = @{ "@odata.id" = "https://graph.microsoft.com/beta/users/$($_.id)" }
+
+                            # Add User
+                            InvokeGraphAPICall -method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members/`$ref" -body $body -silent
+
+                        }
+
+                        $owners.value | ForEach-Object {
+
+                            $body = @{ "@odata.id" = "https://graph.microsoft.com/beta/users/$($_.id)" }
+
+                            # Add User
+                            InvokeGraphAPICall -method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/owners/`$ref" -body $body -silent
+
+                        }
+
+                    }
+                    # If not a member before, remove
+                    if ($alreadyMember -eq $false -and $script:me.id) {
+
+                        # Remove User from cloned Team and new Team
+                        InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/groups/$clonedTeamId/members/$($script:me.id)/`$ref" -silent
+                        InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members/$($script:me.id)/`$ref" -silent
+
+
+                    }
+
+                    # If not a owner before, remove
+                    if ($alreadyOwner -eq $false -and $script:me.id) {
+
+                        # Remove User from cloned Team and new Team
+                        InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/groups/$clonedTeamId/owners/$($script:me.id)/`$ref" -silent
+                        InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/owners/$($script:me.id)/`$ref" -silent
+
+                    }
+
+                    OKPrompt -messageBody "Team has been cloned." -messageTitle "Team Cloned"
+
+                }
 
                 # Close Window
                 $window.CloneTeamWindow.Close()
         
                 # Reload Teams List
                 ListTeams
+
+                GetTeamInformation
 
             }
 
@@ -2396,31 +3370,143 @@ function AddChannel {
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="AddChannelWindow"
-    Title="Add Channel" Width="420" SizeToContent="Height" FontSize="13"
+    Title="Add Channel" SizeToContent="WidthAndHeight" FontSize="13.5"
     >
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#6264A7" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="MinWidth" Value="100" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="3" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#464775" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#33344A" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#BDBDBD" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="#252424" />
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Foreground" Value="#252424" />
+            <Setter Property="BorderBrush" Value="#DFDEDE" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border CornerRadius="3" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                        >
+                            <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#6264A7" />
+                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Grid Height="24" Width="24">
+                                    <Border Name="Outer" Background="Transparent" BorderBrush="#DFDEDE" BorderThickness="2" CornerRadius="3" Margin="2"/>
+                                    <Border Name="CheckMark" Visibility="Hidden" >
+                                        <Path
+                                        x:Name="CheckMarkPath"
+                                        Width="24" Height="24"
+                                        SnapsToDevicePixels="False"
+                                        StrokeThickness="2"
+                                        Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+                                    </Border>
+                                </Grid>
+                            </BulletDecorator.Bullet>
+                            <TextBlock Margin="5,0" Foreground="#252424" VerticalAlignment="Center">
+                            <ContentPresenter />
+                            </TextBlock>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#E2E2F6" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#6264A7" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="CheckMarkPath" Property="Stroke" Value="#DFDEDE" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <StackPanel Orientation="Vertical" Margin="10,0">
         <StackPanel Orientation="Vertical" Margin="5">
                     <StackPanel Orientation="Horizontal" Margin="0,2">
-                        <TextBlock Text="Channel Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                        <TextBox x:Name="channelNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+                        <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="channelNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="250"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,2">
-                        <TextBlock Text="Channel Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                        <TextBox x:Name="channelDescriptionTextBox" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+                        <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="channelDescriptionTextBox" TextWrapping="Wrap" Margin="5,0" Width="250"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,2">
                         <TextBlock Text="Is Favourite:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
                         <CheckBox x:Name="channelFavouriteCheckBox" VerticalAlignment="Center" Margin="5,0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,2">
-                        <TextBlock Text="Create Wiki Tab:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBlock Text="Wiki:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
                         <CheckBox x:Name="channelWikiCheckBox" VerticalAlignment="Center" Margin="5,0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,2">
-                        <TextBlock Text="Create OneNote Tab:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                        <CheckBox x:Name="channelOneNoteCheckBox" VerticalAlignment="Center" Margin="5,0"/>
-                <TextBlock Text="Name:" VerticalAlignment="Center" Margin="5,0"/>
-                <TextBox x:Name="channelOneNoteNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="100"/>
+                        <TextBlock Text="OneNote:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                <CheckBox x:Name="channelOneNoteCheckBox" VerticalAlignment="Center" Margin="5,0"/>
             </StackPanel>
         </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -2460,7 +3546,7 @@ function AddChannel {
     $window.addChannelButton.add_Click( {
 
             # Check the bare minumum is valid
-            if ($window.channelNameTextBox.Text -and $window.channelDescriptionTextBox.Text) {
+            if ($window.channelNameTextBox.Text) {
 
                 # Build Channel
                 $body = @{
@@ -2474,7 +3560,7 @@ function AddChannel {
             }
             else {
 
-                ErrorPrompt -messageBody "Not all fields are complete. Ensure the Channel has a name and a description." -messageTitle "Incomplete"
+                ErrorPrompt -messageBody "Not all fields are complete. Ensure the Channel has a name." -messageTitle "Incomplete"
 
             }
 
@@ -2490,17 +3576,17 @@ function AddChannel {
                     # Set current channel Id to newly created channel
                     $script:currentChannelId = $channel.id
 
-                    # Wiki Tab
-                    if ($window.channelWikiCheckBox.IsChecked -eq $true) {
+                    # Wiki Tab Unchecked - Remove!
+                    if ($window.channelWikiCheckBox.IsChecked -eq $false) {
 
-                        AddWikiTab -wikiName "Setup Wiki"
+                        RemoveWikiTab
 
                     }
 
                     # Create OneNote notebook and Tab once Channel has been created and returned
-                    if ($window.channelOneNoteCheckBox.IsChecked -eq $true -and $window.channelOneNoteNameTextBox.Text) {
+                    if ($window.channelOneNoteCheckBox.IsChecked -eq $true) {
 
-                        AddOneNoteTab -notebookName $window.channelOneNoteNameTextBox.Text
+                        AddOneNoteTab -notebookName $window.channelNameTextBox.Text -tabName "OneNote"
 
                     }
 
@@ -2572,22 +3658,29 @@ function UpdateChannel {
 
     )
 
-    if (-not [string]::IsNullOrEmpty($script:currentTeamId) -and -not [string]::IsNullOrEmpty($script:currentChannelId) -and $script:mainWindow.channelDisplayNameTextBox.Text -and $script:mainWindow.channelDescriptionTextBox.Text) {
+    if (-not [string]::IsNullOrEmpty($script:currentTeamId) -and -not [string]::IsNullOrEmpty($script:currentChannelId) -and $script:mainWindow.channelDisplayNameTextBox.Text) {
 
         # Build request body for Channel
         $body = @{
 
-            # General
-            displayName         = $script:mainWindow.channelDisplayNameTextBox.Text
             description         = $script:mainWindow.channelDescriptionTextBox.Text
             isFavoriteByDefault = $script:mainWindow.channelIsFavouriteByDefault2CheckBox.IsChecked
+
+        }
+
+        # If Channel Name has changed, include it
+        $channel = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId"
+
+        if ($channel.displayName -ne $script:mainWindow.ChannelDisplayNameTextBox.Text) {
+
+            $body.Add("displayName", $script:mainWindow.channelDisplayNameTextBox.Text)
 
         }
 
     }
     else {
 
-        ErrorPrompt -messageBody "Not all fields are complete. Ensure the Channel has a name and a description." -messageTitle "Incomplete"
+        ErrorPrompt -messageBody "Not all fields are complete. Ensure the Channel has a name." -messageTitle "Incomplete"
 
     }
 
@@ -2627,21 +3720,246 @@ function AddTab {
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="AddTabWindow"
-    Title="Add Tab" Width="420" SizeToContent="Height" FontSize="13"
+    Title="Add Tab" SizeToContent="WidthAndHeight" FontSize="13.5"
     >
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#6264A7" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="MinWidth" Value="100" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="3" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#464775" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#33344A" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#BDBDBD" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="#252424" />
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Foreground" Value="#252424" />
+            <Setter Property="BorderBrush" Value="#DFDEDE" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border CornerRadius="3" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                        >
+                            <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#6264A7" />
+                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- Inspired from https://stackoverflow.com/questions/22673483/how-do-i-create-a-flat-combo-box-using-wpf -->
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="32" />
+                </Grid.ColumnDefinitions>
+                <Border
+                  x:Name="Border" 
+                  Grid.ColumnSpan="2"
+                  Height="30"
+                  CornerRadius="3"
+                  BorderBrush="#DFDEDE"
+                  Background="White"
+                  BorderThickness="1" />
+                <Border 
+                  Grid.Column="0"
+                  CornerRadius="3,0,0,3" 
+                  Margin="1"
+                 
+                  />
+                <Path 
+                  x:Name="Arrow"
+                  Grid.Column="1"     
+                  Fill="#6264A7"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
+                    Width="24"
+                    Height="24"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter TargetName="Border" Property="Background" Value="#F3F2F1" />
+                    <Setter TargetName="Border" Property="BorderBrush" Value="#DFDEDE" />
+                    <Setter Property="Foreground" Value="#252424"/>
+                    <Setter TargetName="Arrow" Property="Fill" Value="#DFDEDE" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
+            <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
+        </ControlTemplate>
+        <Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="MinWidth" Value="120"/>
+            <Setter Property="MinHeight" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton 
+                            Name="ToggleButton" 
+                            Template="{StaticResource ComboBoxToggleButton}" 
+                            Grid.Column="2" 
+                            Focusable="false"
+                            IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                            ClickMode="Press">
+                            </ToggleButton>
+                            <ContentPresenter
+                            Name="ContentSite"
+                            IsHitTestVisible="False" 
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                            Margin="8,3,28,3"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left" />
+                            <TextBox x:Name="PART_EditableTextBox"
+                            Style="{x:Null}" 
+                            Template="{StaticResource ComboBoxTextBox}" 
+                            HorizontalAlignment="Left" 
+                            VerticalAlignment="Center"
+                            Focusable="True" 
+                            Background="Transparent"
+                            Visibility="Hidden"
+                            />
+                            <Popup 
+                            Name="Popup"
+                            Placement="Bottom"
+                            IsOpen="{TemplateBinding IsDropDownOpen}"
+                            AllowsTransparency="True" 
+                            Focusable="False"
+                            PopupAnimation="Slide">
+                                <Grid 
+                                  Name="DropDown"
+                                  SnapsToDevicePixels="True"                
+                                  MinWidth="{TemplateBinding ActualWidth}"
+                                  MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border 
+                                    x:Name="DropDownBorder"
+                                    Background="White"
+                                    BorderThickness="1"
+                                    BorderBrush="#DFDEDE"
+                                    CornerRadius="3"    
+                                        />
+                                    <ScrollViewer Margin="0,5" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
+                            </Trigger>
+                            <Trigger Property="IsGrouping" Value="true">
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable" Value="true">
+                                <Setter Property="IsTabStop" Value="false"/>
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border 
+                      Name="Border"
+                      Padding="8,5"
+                      SnapsToDevicePixels="true">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#E2E2F6" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#252424"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!---->
+    </Window.Resources>
     <StackPanel Orientation="Vertical" Margin="10,0">
         <StackPanel Orientation="Vertical" Margin="5">
             <StackPanel Orientation="Horizontal" Margin="0,2">
-                <TextBlock Text="Tab Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                <TextBox x:Name="tabNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+                <TextBlock Text="Name:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                <TextBox x:Name="tabNameTextBox" TextWrapping="Wrap" Margin="5,0" Width="260"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,2">
-                <TextBlock Text="Tab Type:" Width="120" VerticalAlignment="Center" TextAlignment="Right"/>
+                <TextBlock Text="Type:" Width="100" VerticalAlignment="Center" TextAlignment="Right"/>
                 <ComboBox x:Name="tabTypeComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,2">
-                <TextBlock Text="Website Tab URL:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                <TextBox x:Name="tabURLTextBox" TextWrapping="Wrap" Margin="5,0" Width="200" IsEnabled="False"/>
+                <TextBlock Text="Website Tab URL:" Width="100" TextAlignment="Right" VerticalAlignment="Center"/>
+                <TextBox x:Name="tabURLTextBox" TextWrapping="Wrap" Margin="5,0" Width="260" IsEnabled="False"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -2701,7 +4019,7 @@ function AddTab {
                 }
                 elseif ($window.tabTypeComboBox.SelectedItem -eq "OneNote") {
                     
-                    $tab = AddOneNoteTab -notebookName $window.tabNameTextBox.Text
+                    $tab = AddOneNoteTab -notebookName $window.tabNameTextBox.Text -tabName $window.tabNameTextBox.Text
 
                     # Website type?
                 }
@@ -2879,23 +4197,98 @@ function AddUserToTeam {
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="AddUserWindow"
-    Title="Add User" Width="400" SizeToContent="WidthAndHeight" FontSize="13"
+    Title="Add User" SizeToContent="WidthAndHeight" FontSize="13.5"
     >
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#6264A7" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="MinWidth" Value="100" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="3" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#464775" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#33344A" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#BDBDBD" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="#252424" />
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Foreground" Value="#252424" />
+            <Setter Property="BorderBrush" Value="#DFDEDE" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border CornerRadius="3" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                        >
+                            <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#6264A7" />
+                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 <StackPanel Orientation="Vertical" Margin="10">
         <StackPanel Orientation="Horizontal" Margin="0,2">
-            <TextBlock Text="User (UPN):" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-            <TextBox x:Name="userTextBox" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+            <TextBlock Text="User (UPN):" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+            <TextBox x:Name="userTextBox" TextWrapping="Wrap" Margin="5,0" Width="400"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,2">
-            <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+            <TextBlock Text="Name:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
             <TextBlock x:Name="userDisplayNameTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,2">
-            <TextBlock Text="Title:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+            <TextBlock Text="Title:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
             <TextBlock x:Name="userJobTitleTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,2">
-            <TextBlock Text="Location:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+            <TextBlock Text="Location:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
             <TextBlock x:Name="userLocationTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -2963,8 +4356,6 @@ function AddUserToTeam {
             }
 
         })
-
-    $
 
     # Add User Clicked
     $window.addUserAddButton.add_Click( {
@@ -3072,11 +4463,31 @@ function AddWikiTab {
 
 }
 
+function RemoveWikiTab {
+    param (
+        
+    )
+
+    # Get Wiki Tab Id
+    $tab = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs?`$filter=displayName eq 'Wiki'"
+
+    if ($tab.value.id) {
+
+        $script:currentTabId = $tab.value.id
+
+        # Remove autocreated Wiki
+        InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs/$script:currentTabId"
+
+    }
+    
+}
+
 function AddOneNoteTab {
 
     param (
 
-        [Parameter(mandatory = $true)][string]$notebookName
+        [Parameter(mandatory = $true)][string]$notebookName,
+        [Parameter(mandatory = $true)][string]$tabName
 
     )
 
@@ -3087,6 +4498,14 @@ function AddOneNoteTab {
 
             displayName = $notebookName
 
+        }
+
+        # If using user permissions, if not already a member, temporarily add logged in user to the group (as membership is required to create a group notebook)
+        if ($script:me.id) {
+
+            # Check if already a member or not
+            $alreadyMember = checkIfMember
+            
         }
 
         $notebook = InvokeGraphAPICall -Method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/onenote/notebooks" -body $notebookBody
@@ -3103,7 +4522,7 @@ function AddOneNoteTab {
             $tabBody = @{
 
                 "teamsApp@odata.bind" = "https://graph.microsoft.com/v1.0/appCatalogs/teamsApps('0d820ecd-def2-4297-adad-78056cde7c78')"
-                displayName           = $notebookName
+                displayName           = $tabName
 
                 configuration         = @{
 
@@ -3117,6 +4536,14 @@ function AddOneNoteTab {
             }
 
             $tab = InvokeGraphAPICall -Method "POST" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs" -body $tabBody
+
+            # If not a member before, remove
+            if ($alreadyMember -eq $false -and $script:me.id) {
+
+                # Remove User
+                InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members/$($script:me.id)/`$ref"
+
+            }
 
             return $tab
 
@@ -3193,6 +4620,94 @@ function OKPrompt {
 
 }
 
+function checkIfOwner {
+
+    param (
+
+
+    )
+
+    $alreadyOwner = $null
+
+    $owners = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/owners"
+
+    $owners.value | ForEach-Object {
+
+        if ($_.id -eq $script:me.id) {
+            
+            # Already a owner
+            $alreadyOwner = $true
+
+        }
+
+        # If not already a owner, temporarily add
+        if ([string]::IsNullOrEmpty($alreadyOwner)) {
+                
+            $body = @{ "@odata.id" = "https://graph.microsoft.com/beta/users/$($script:me.id)" }
+
+            # Add User
+            InvokeGraphAPICall -method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/owners/`$ref" -body $body -silent
+
+            # Wait a little bit before proceeding
+            Start-Sleep -Seconds 2
+
+            return $false
+
+        }
+        else {
+            
+            return $true
+
+        }
+
+    }
+
+}
+
+function checkIfMember {
+
+    param (
+
+
+    )
+
+    $alreadyMember = $null
+
+    $members = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members"
+
+    $members.value | ForEach-Object {
+
+        if ($_.id -eq $script:me.id) {
+            
+            # Already a member
+            $alreadyMember = $true
+
+        }
+
+        # If not already a member, temporarily add
+        if ([string]::IsNullOrEmpty($alreadyMember)) {
+                
+            $body = @{ "@odata.id" = "https://graph.microsoft.com/beta/users/$($script:me.id)" }
+
+            # Add User
+            InvokeGraphAPICall -method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members/`$ref" -body $body -silent
+
+            # Wait a little bit before proceeding
+            Start-Sleep -Seconds 2
+
+            return $false
+
+        }
+        else {
+            
+            return $true
+
+        }
+
+    }
+
+}
+
 function TeamsReport {
     param (
         
@@ -3261,6 +4776,9 @@ function TeamsReport {
             AllowStickersAndMemes             = $team.funSettings.allowStickersAndMemes
             AllowCustomMemes                  = $team.funSettings.allowCustomMemes
 
+            # Discovery Settings
+            ShowInTeamsSearchAndSuggestions   = $team.discoverySettings.showInTeamsSearchAndSuggestions
+
             # Totals
             NumberChannels                    = (($channels).value).Count
             NumberOwners                      = (($owners).value).Count
@@ -3300,12 +4818,10 @@ LoadMainWindow
 # Privacy
 $privacyOptions = @("Private", "Public") | Sort-Object
 $script:mainWindow.teamPrivacyComboBox.ItemsSource = $privacyOptions
-$script:mainWindow.teamPrivacyComboBox.SelectedItem = "Private"
 
 # Giphy
 $giphyOptions = @("Strict", "Moderate") | Sort-Object
 $script:mainWindow.giphyContentRatingComboBox.ItemsSource = $giphyOptions
-$script:mainWindow.giphyContentRatingComboBox.SelectedItem = "Moderate"
 
 # WPF Events
 # Connect Clicked
@@ -3316,7 +4832,13 @@ $script:mainWindow.connectButton.add_Click( {
         # If there is an issued token
         if ($script:issuedToken.access_token) {
 
-            OKPrompt -messageBody "Connected - Successfully obtained Graph API token." -messageTitle "Connected"
+            if ($script:me.userPrincipalName) {
+
+                $loggedInUser = "`n`rLogged in as: $($script:me.userPrincipalName)"
+
+            }
+
+            OKPrompt -messageBody "Connected successfully to MS Graph $($loggedInUser)" -messageTitle "Connected to MS Graph"
 
             # Change UI State
             $script:mainWindow.disconnectButton.IsEnabled = $true
@@ -3524,6 +5046,29 @@ $script:mainWindow.useSharedAzureADApplicationRadioButton.add_Click( {
 $script:mainWindow.teamsReportButton.add_Click( {
 
         TeamsReport
+
+    })
+
+# Team Visibility Changed
+$script:mainWindow.teamPrivacyComboBox.add_SelectionChanged( {
+
+        # Change discovery settings based on visibility
+        if ($script:mainWindow.teamPrivacyComboBox.SelectedItem -eq "Public") {
+        
+            # Enable discovery
+            $script:mainWindow.showInTeamsSearchAndSuggestionsCheckBox.IsChecked = $true
+            # Disable Checkbox
+            $script:mainWindow.showInTeamsSearchAndSuggestionsCheckBox.IsEnabled = $false
+
+        }
+        elseif ($script:mainWindow.teamPrivacyComboBox.SelectedItem -eq "Private") {
+
+            # Enable discovery
+            $script:mainWindow.showInTeamsSearchAndSuggestionsCheckBox.IsChecked = $false
+            # Enable Checkbox
+            $script:mainWindow.showInTeamsSearchAndSuggestionsCheckBox.IsEnabled = $true
+
+        }
 
     })
 
