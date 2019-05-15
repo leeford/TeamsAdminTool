@@ -55,7 +55,7 @@ To connect to Graph, you will need to use an Azure AD v2.0 Application. The appl
 
 * Group.ReadWrite.All - Allows creation and modification of Groups/Teams
 * Directory.Read.All - Allows read-only access to directory for Group/Team membership
-* Notes.ReadWrite.All - Allows access to Notebooks that a user can access _Note: When using user permissions to create Notebooks the user is temporarily added to the group to facilitate this_
+* Notes.ReadWrite.All - Allows access to Notebooks _Note: When using user permissions to create Notebooks the user is temporarily added to the group to facilitate this_
 
 There are two ways this can be achieved:
 
