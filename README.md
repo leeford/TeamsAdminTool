@@ -3,7 +3,7 @@
 _**Disclaimer:** This script is provided ‘as-is’ without any warranty or support. Use of this script is at your own risk and I accept no responsibility for any damage caused._
 
 ## What is it?
-![TeamsAdminTool](https://www.lee-ford.co.uk/images/2019-05-14 21_36_41-TeamsAdminTool.png)
+![TeamsAdminTool](https://www.lee-ford.co.uk/images/TeamsAdminTool.png)
 
 TeamsAdminTool is a tool that allows you to manage Teams (inc. settings), Channels, Tabs etc. from a single GUI interface. It is written in Windows PowerShell (relies on WPF so won't work with Core) and requires no additional modules to be installed. To use the tool, simply clone/download the _TeamsAdminTool.ps1_ file and run from PowerShell.
 
