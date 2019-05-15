@@ -62,10 +62,10 @@ There are two ways this can be achieved:
   1. **Connect using a shared, pre-configured Azure AD Application** - This is the easiest option and no setup is required, using a shared application all you will need to do is login using your O365 account and consent the application against your tenant (admin consent required):
      
       _Grant Consent Prompt:_
-      ![](/images/2019-05-15 13_45_55-GrantConsent.png)
+      ![](https://www.lee-ford.co.uk/images/2019-05-15 13_45_55-GrantConsent.png)
 
       _Application Consent Granted in Azure AD:_
-      ![](/images/2019-05-15 13_54_24-Enterprise applications - Microsoft Azure.png)
+      ![](https://www.lee-ford.co.uk/images/2019-05-15%2013_54_24-Enterprise%20applications%20-%20Microsoft%20Azure.png)
 
       _Note: This does method does not provide access to your tenant for anyone other than the users you grant it to in your own tenant. It is essentially a template of permissions._
       
@@ -82,7 +82,7 @@ There are two ways this can be achieved:
     ```.\TeamsAdminTool.ps1```
 
 3. Choose an Azure AD Application type and click **Connect**. If prompted, login using your O365 credentials
-    ![](/images/2019-05-15 13_11_11-TeamsAdminTool.png)
+    ![](https://www.lee-ford.co.uk/images/2019-05-15 13_11_11-TeamsAdminTool.png)
 
 ## Known Issues
 
