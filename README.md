@@ -62,14 +62,17 @@ There are two ways this can be achieved:
   1. **Connect using a shared, pre-configured Azure AD Application** - This is the easiest option and no setup is required, using a shared application all you will need to do is login using your O365 account and consent the application against your tenant (admin consent required):
      
       _Grant Consent Prompt:_
-      ![](https://www.lee-ford.co.uk/images/2019-05-15 13_45_55-GrantConsent.png)
+      ![](https://www.lee-ford.co.uk/images/TeamsAdminToolGrantConsent.png)
 
       _Application Consent Granted in Azure AD:_
       ![](https://www.lee-ford.co.uk/images/2019-05-15%2013_54_24-Enterprise%20applications%20-%20Microsoft%20Azure.png)
 
       _Note: This does method does not provide access to your tenant for anyone other than the users you grant it to in your own tenant. It is essentially a template of permissions._
       
-  2. **Create your own Azure AD Application** - Using the permissions mentioned above, create an application and grant the permissions as delegated user or application permissions.
+  2. **Create your own Azure AD Application** - Using the permissions mentioned above, create an Azure AD application ensuring you:
+      * Grant the permissions mentioned above as delegated user or application permissions
+      * If using application permissions, create a secret
+      * If using delegated user permissions, ensure the Redirect URI https://login.microsoftonline.com/common/oauth2/nativeclient is checked
 
 ## Usage
 
