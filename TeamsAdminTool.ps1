@@ -1039,7 +1039,7 @@ function GetAuthCodeUser {
     $state = Get-Random
 
     # Encode scope to fit inside query string
-    $script:scope = "Group.ReadWrite.All User.ReadWrite.All Notes.ReadWrite.All"
+    $script:scope = "Group.ReadWrite.All Directory.Read.All Notes.ReadWrite.All"
     $encodedScope = [System.Web.HttpUtility]::UrlEncode($script:scope)
 
     # Redirect URI (encode it to fit inside query string)
