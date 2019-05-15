@@ -66,7 +66,7 @@ There are two ways this can be achieved:
       ![](https://www.lee-ford.co.uk/images/TeamsAdminToolGrantConsent.png)
 
       _Application Consent Granted in Azure AD:_
-      
+
       ![](https://www.lee-ford.co.uk/images/2019-05-15%2013_54_24-Enterprise%20applications%20-%20Microsoft%20Azure.png)
 
       _Note: This does method does not provide access to your tenant for anyone other than the users you grant it to in your own tenant. It is essentially a template of permissions._
@@ -87,7 +87,7 @@ There are two ways this can be achieved:
     ```.\TeamsAdminTool.ps1```
 
 3. Choose an Azure AD Application type and click **Connect**. If prompted, login using your O365 credentials
-    ![](https://www.lee-ford.co.uk/images/2019-05-15 13_11_11-TeamsAdminTool.png)
+    ![](https://www.lee-ford.co.uk/images/ConnectTeamsAdminTool.png)
 
 ## Known Issues
 
