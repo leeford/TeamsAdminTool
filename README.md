@@ -46,7 +46,7 @@ TeamsAdminTool allows you to manage many aspects of a Team that cannot currently
 | **Teams Report**                   |      Yes       |         No         |        No        |
 
 ## How is this done?
-TeamsAdminTool is built using Microsoft's Graph API which from what I gather, what the Admin Centre and PowerShell Module use. **Currently, this tool is using Graph API beta endpoints** to acheive full functionality. The plan is to roll this back to v1.0 endpoints as functionality becomes available.
+TeamsAdminTool is built using Microsoft's Graph API which from what I gather, what the Admin Centre and PowerShell Module use. **Currently, this tool is using Graph API beta endpoints** to achieve full functionality. The plan is to roll this back to v1.0 endpoints as functionality becomes available.
 
 _Note: Whilst there may be bugs with using the beta endpoint, in testing most functions work as expected (see Known Issues section), although being a beta this could change. If you are unsure of impact of the tool making changes to your Teams whilst it used beta endpoints - It is strongly advised you use the tool on some test Teams or a test Tenant._
 
@@ -59,7 +59,7 @@ To connect to Graph, you will need to use an Azure AD v2.0 Application. The appl
 
 There are two ways this can be achieved:
 
-  1. **Connect using a shared, pre-configured Azure AD Application** - This is the easiest option and no setup is required, using a shared application all you will need to do is login using your O365 account and consent the application against your tenant (admin consent required):
+  1. **Connect using a shared, pre-configured Azure AD Application** - This is the easiest option and no set up is required, using a shared application all you will need to do is login using your O365 account and consent the application against your tenant (admin consent required):
      
       _Grant Consent Prompt:_
 
@@ -93,3 +93,4 @@ There are two ways this can be achieved:
 
 * When cloning a Team, the mail nickname specified will not be used - This is a Graph bug
 * When retrieving or setting the Channel "IsFavoriteByDefault" value, null is returned - This is a [Graph bug](https://github.com/microsoftgraph/microsoft-graph-docs/issues/4241)
+* When creating a OneNote tab (including the Tab name), once a Teams user interfaces with the Tab for the first time, the Tab is renamed to 'note'. Unsure what (if anything) can be done about this as this occurs outside this tool.
