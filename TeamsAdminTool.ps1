@@ -4722,6 +4722,9 @@ function TeamsReport {
     $saveAs.Filter = "CSV|*.csv"
     $saveAs.ShowDialog()
 
+    # Warn can take a while
+    OKPrompt -messageBody "Click OK to start compiling report - check PowerShell console for progress.`n`rThis may take some time, please be patient." -messageTitle "Please Wait"
+
     # Get all groups that are Teams
     $groups = InvokeGraphAPICall -method "GET" -uri "https://graph.microsoft.com/beta/groups?`$filter=resourceProvisioningOptions/Any(x:x eq 'Team')" -silent
     $totalGroups = (($groups).value).Count
