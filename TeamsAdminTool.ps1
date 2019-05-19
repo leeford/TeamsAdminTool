@@ -2280,6 +2280,28 @@ function AddTeam {
     $window.giphyContentRatingComboBox.ItemsSource = $giphyOptions
     $window.giphyContentRatingComboBox.SelectedItem = "Moderate"
 
+    # If logged in as a user, pre-populate owner as logged in user:
+    if ($script:me.id) {
+        
+        $ownersDataGrid = @()
+
+        $owner = @{
+
+            displayName       = $me.displayName
+            userPrincipalName = $me.userPrincipalName
+            jobTitle          = $me.jobTitle
+            officeLocation    = $me.officeLocation
+            id                = $me.id
+
+        }
+
+        $ownersDataGrid += New-Object PSObject -Property $owner
+
+        # Add new and existing owners
+        $window.teamOwnersDataGrid.ItemsSource = $ownersDataGrid
+
+    }
+
     # Events
     # Cancel Clicked
     $window.cancelButton.add_Click( {
@@ -2627,8 +2649,6 @@ function AddTeam {
 
                 # Add new and existing owners
                 $window.teamOwnersDataGrid.ItemsSource = $ownersDataGrid
-
-                # 
 
             }
         })
