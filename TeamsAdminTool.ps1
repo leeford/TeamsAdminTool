@@ -263,7 +263,7 @@ function LoadMainWindow {
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
                                 <Setter Property="BorderBrush" Value="#6264A7" />
-                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                                <Setter Property="BorderThickness" Value="1" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Background" Value="#F3F2F1" />
@@ -580,7 +580,7 @@ function LoadMainWindow {
                         <StackPanel Orientation="Vertical">
                             <TextBlock x:Name="totalTeamsTextBlock" Text="Teams (0):" FontSize="20" Margin="5,0,0,5"/>
                             <TextBox x:Name="teamsFilterTextBox"/>
-                            <ListBox x:Name="teamsListBox" Width="220" MaxHeight="640" Margin="4,10"/>
+                            <ListBox x:Name="teamsListBox" MinWidth="220" MaxHeight="640" Margin="4,10"/>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="10,0,0,0">
                             <StackPanel Orientation="Vertical">
@@ -750,11 +750,11 @@ function LoadMainWindow {
                                                             <StackPanel Orientation="Vertical" Margin="5">
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
                                                                     <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBox x:Name="channelDisplayNameTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                                                    <TextBox x:Name="channelDisplayNameTextBox" Width="700" TextWrapping="Wrap" Margin="5,0"/>
                                                                 </StackPanel>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
                                                                     <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                                    <TextBox x:Name="channelDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                                                    <TextBox x:Name="channelDescriptionTextBox" Width="700" TextWrapping="Wrap" Margin="5,0"/>
                                                                 </StackPanel>
                                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
                                                                     <TextBlock Text="Favourite:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
@@ -787,11 +787,11 @@ function LoadMainWindow {
                                                 <StackPanel Orientation="Vertical" Margin="5">
                                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                                         <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                        <TextBox x:Name="teamDisplayNameTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                                        <TextBox x:Name="teamDisplayNameTextBox" Width="700" TextWrapping="Wrap" Margin="5,0"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                                         <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                        <TextBox x:Name="teamDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                                        <TextBox x:Name="teamDescriptionTextBox" Width="700" TextWrapping="Wrap" Margin="5,0"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                                         <TextBlock Text="Privacy:" Width="120" VerticalAlignment="Center" TextAlignment="Right"/>
@@ -1956,7 +1956,7 @@ function AddTeam {
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
                                 <Setter Property="BorderBrush" Value="#6264A7" />
-                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                                <Setter Property="BorderThickness" Value="1" />
                             </Trigger>
                             <Trigger Property="IsReadOnly" Value="True">
                                 <Setter Property="Background" Value="#F3F2F1" />
@@ -2077,7 +2077,7 @@ function AddTeam {
         <StackPanel Orientation="Vertical" Margin="10,0">
             <GroupBox Header="Standard Team" Margin="0,5">
                 <StackPanel Orientation="Vertical" Margin="10">
-                    <RadioButton x:Name="standardTeamRadioButton" Content="Create a Standard Team" GroupName="teamType" IsChecked="True" Margin="0,10"/>
+                    <RadioButton x:Name="standardTeamRadioButton" Content="Create a Standard Team" GroupName="teamType" IsChecked="True" Margin="0,0,0,10"/>
                     <Expander Header="General" IsExpanded="True">
                         <StackPanel Orientation="Vertical" Margin="5">
                             <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -2236,7 +2236,7 @@ function AddTeam {
             </GroupBox>
             <GroupBox Header="Custom Team" Margin="0,5">
                 <StackPanel Orientation="Vertical" Margin="10">
-                    <RadioButton x:Name="customTeamRadioButton" Content="Create a Custom Team using JSON" GroupName="teamType" IsChecked="False" Margin="0,10"/>
+                    <RadioButton x:Name="customTeamRadioButton" Content="Create a Custom Team using JSON" GroupName="teamType" IsChecked="False" Margin="0,0,0,10"/>
                     <TextBlock Text="Example JSON for creating Teams can be found at the Graph API documentation:" FontStyle="Italic" Margin="10,0"/>
                     <TextBlock Text="https://docs.microsoft.com/en-gb/graph/api/team-post?view=graph-rest-beta" Margin="10,0"/>
                     <Expander Header="JSON" Margin="0,10">
@@ -2906,7 +2906,7 @@ function CloneTeam {
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
                                 <Setter Property="BorderBrush" Value="#6264A7" />
-                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                                <Setter Property="BorderThickness" Value="1" />
                             </Trigger>
                             <Trigger Property="IsReadOnly" Value="True">
                                 <Setter Property="Background" Value="#F3F2F1" />
@@ -3431,7 +3431,7 @@ function AddChannel {
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
                                 <Setter Property="BorderBrush" Value="#6264A7" />
-                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                                <Setter Property="BorderThickness" Value="1" />
                             </Trigger>
                             <Trigger Property="IsReadOnly" Value="True">
                                 <Setter Property="Background" Value="#F3F2F1" />
@@ -3781,7 +3781,7 @@ function AddTab {
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
                                 <Setter Property="BorderBrush" Value="#6264A7" />
-                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                                <Setter Property="BorderThickness" Value="1" />
                             </Trigger>
                             <Trigger Property="IsReadOnly" Value="True">
                                 <Setter Property="Background" Value="#F3F2F1" />
@@ -4258,7 +4258,7 @@ function AddUserToTeam {
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
                                 <Setter Property="BorderBrush" Value="#6264A7" />
-                                <Setter Property="BorderThickness" Value="0,0,0,2" />
+                                <Setter Property="BorderThickness" Value="1" />
                             </Trigger>
                             <Trigger Property="IsReadOnly" Value="True">
                                 <Setter Property="Background" Value="#F3F2F1" />
