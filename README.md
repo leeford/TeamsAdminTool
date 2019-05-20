@@ -60,6 +60,8 @@ To connect to Graph, you will need to use an Azure AD v2.0 Application. The appl
 There are two ways this can be achieved:
 
   1. **Connect using a shared, pre-configured Azure AD Application** - This is the easiest option and no set up is required, using a shared application all you will need to do is login using your O365 account and consent the application against your tenant (admin consent required):
+
+    You can grant consent when signing in with the tool or by going to this URL: (https://login.microsoftonline.com/common/adminconsent?client_id=6d84adaa-2a01-4f45-964b-180cbdbfd20d)
      
       _Grant Consent Prompt:_
 
