@@ -1228,7 +1228,7 @@ function GetAuthTokenApplication {
 
 }
 
-function InvokeGraphAPICall {
+function GraphAPICall {
     param (
         
         [Parameter(mandatory = $true)][string]$method,
@@ -1239,37 +1239,6 @@ function InvokeGraphAPICall {
 
     )
 
-    # Calculate current token age
-    $tokenAge = New-TimeSpan $script:tokenTimer (Get-Date)
-
-    # Check token has not expired
-    if ($tokenAge.TotalSeconds -gt 3500) {
-
-        Write-Warning "Token May Have Expired! Refreshing..."
-
-        # If last token issued included a refresh token (user)
-        if ($script:issuedToken.refresh_token) {
-
-            # Get new token using refresh token
-            $script:issuedToken = GetAuthTokenUserRefresh
-
-        }
-        else {
-
-            # Otherwise authenticate without
-            GetAuthToken
-
-        }
-
-    }
-
-    # If no content type, use application/json
-    if (-not $contentType) {
-
-        $contentType = "application/json"
-
-    }
-        
     # Construct headers
     $Headers = @{"Authorization" = "Bearer $($script:issuedToken.access_token)" }
 
@@ -1313,10 +1282,80 @@ function InvokeGraphAPICall {
     # Store any response incase it is needed
     $script:lastAPICallReponse = $apiCall
 
-    # Return content (assume it's in JSON format)
-    if ($apiCall.Content) {
+    return $apiCall
+    
+}
 
-        return $apiCall.Content | ConvertFrom-Json  
+function InvokeGraphAPICall {
+    param (
+        
+        [Parameter(mandatory = $true)][string]$method,
+        [Parameter(mandatory = $true)][uri]$uri,
+        [Parameter(mandatory = $false)]$body,
+        [Parameter(mandatory = $false)][string]$contentType = "application/json",
+        [Parameter(mandatory = $false)][switch]$silent
+
+    )
+
+    # Calculate current token age
+    $tokenAge = New-TimeSpan $script:tokenTimer (Get-Date)
+
+    # Check token has not expired
+    if ($tokenAge.TotalSeconds -gt 3500) {
+
+        Write-Warning "Token May Have Expired! Refreshing..."
+
+        # If last token issued included a refresh token (user)
+        if ($script:issuedToken.refresh_token) {
+
+            # Get new token using refresh token
+            $script:issuedToken = GetAuthTokenUserRefresh
+
+        }
+        else {
+
+            # Otherwise authenticate without
+            GetAuthToken
+
+        }
+
+    }
+
+    $currentUri = $uri
+
+    $content = while (-not [string]::IsNullOrEmpty($currentUri)) {
+
+        # API Call
+        if ($silent) {
+        
+            $apiCall = GraphAPICall -method $method -uri $currentUri -body $body -contentType $contentType -silent
+        
+        }
+        else {
+    
+            $apiCall = GraphAPICall -method $method -uri $currentUri -body $body -contentType $contentType
+    
+        }
+
+        $nextLink = $null
+        $currentUri = $null
+
+        if ($apiCall.Content) {
+
+            # Check if any data is left
+            $nextLink = $apiCall.Content | ConvertFrom-Json | Select-Object '@odata.nextLink'
+            $currentUri = $nextLink.'@odata.nextLink'
+
+            $apiCall.Content | ConvertFrom-Json
+
+        }
+
+    }
+
+    # Return content (assume it's in JSON format)
+    if ($content) {
+
+        return $content
 
     }
 
@@ -1342,7 +1381,7 @@ function ValidateRegex {
 
 }
 
- function GetTeamInformation {
+function GetTeamInformation {
     param (
 
     )
@@ -5460,13 +5499,13 @@ $script:mainWindow.addTeamMemberButton.add_Click( {
 # Edit Member clicked
 $script:mainWindow.editTeamMemberButton.add_Click( {
 
-    if ($script:mainWindow.teamMembersDataGrid.SelectedItem.Role -eq "Owner" -or $script:mainWindow.teamMembersDataGrid.SelectedItem.Role -eq "Member") {
+        if ($script:mainWindow.teamMembersDataGrid.SelectedItem.Role -eq "Owner" -or $script:mainWindow.teamMembersDataGrid.SelectedItem.Role -eq "Member") {
         
-        EditUserInTeam -user $script:mainWindow.teamMembersDataGrid.SelectedItem
+            EditUserInTeam -user $script:mainWindow.teamMembersDataGrid.SelectedItem
 
-    }
+        }
 
-})
+    })
 
 # Remove Member clicked
 $script:mainWindow.removeTeamMemberButton.add_Click( {
@@ -5476,21 +5515,22 @@ $script:mainWindow.removeTeamMemberButton.add_Click( {
     })
 
 # Member Datagrid Selection Changed
-$script:mainWindow.teamMembersDataGrid.add_SelectionChanged({
+$script:mainWindow.teamMembersDataGrid.add_SelectionChanged( {
 
-    if ($script:mainWindow.teamMembersDataGrid.SelectedItem.Role -eq "Guest") {
+        if ($script:mainWindow.teamMembersDataGrid.SelectedItem.Role -eq "Guest") {
 
-        # Disable Edit Button
-        $script:mainWindow.editTeamMemberButton.IsEnabled = $false
+            # Disable Edit Button
+            $script:mainWindow.editTeamMemberButton.IsEnabled = $false
 
-    } else {
+        }
+        else {
 
-        # Enable Edit Button
-        $script:mainWindow.editTeamMemberButton.IsEnabled = $true
+            # Enable Edit Button
+            $script:mainWindow.editTeamMemberButton.IsEnabled = $true
 
-    }
+        }
 
-})
+    })
 
 # Update Team clicked
 $script:mainWindow.updateTeamButton.add_Click( {
