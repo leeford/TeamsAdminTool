@@ -580,7 +580,7 @@ function LoadMainWindow {
                         <StackPanel Orientation="Vertical">
                             <TextBlock x:Name="totalTeamsTextBlock" Text="Teams (0):" FontSize="20" Margin="5,0,0,5"/>
                             <TextBox x:Name="teamsFilterTextBox"/>
-                            <ListBox x:Name="teamsListBox" MinWidth="220" MaxHeight="640" Margin="4,10"/>
+                            <ListBox x:Name="teamsListBox" MinWidth="220" MaxWidth="450" MaxHeight="640" Margin="4,10"/>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="10,0,0,0">
                             <StackPanel Orientation="Vertical">
@@ -613,12 +613,16 @@ function LoadMainWindow {
                                                     <CheckBox x:Name="teamArchivedCheckBox" Margin="5,0" IsHitTestVisible="False" Focusable="False" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                    <TextBlock Text="Owners:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBlock x:Name="totalTeamOwnersTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,2">
                                                     <TextBlock Text="Members:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
                                                     <TextBlock x:Name="totalTeamMembersTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
-                                                    <TextBlock Text="Owners:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                                    <TextBlock x:Name="totalTeamOwnersTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
+                                                    <TextBlock Text="Guests:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                    <TextBlock x:Name="totalTeamGuestsTextBlock" Width="500" TextWrapping="Wrap" Margin="5,0"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,2">
                                                     <TextBlock Text="Channels:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
@@ -630,33 +634,21 @@ function LoadMainWindow {
                                 </TabItem>
                                 <TabItem x:Name="teamMembersTabItem" Header="Membership" Width="100" Height="30">
                                     <StackPanel Orientation="Vertical" Margin="10">
-                                        <TextBlock x:Name="teamMembersTextBlock" Text="Members (0):" FontSize="16"/>
-                                        <DataGrid x:Name="teamMembersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="220" SelectionMode="Single" Width="1025">
+                                        <TextBlock x:Name="teamMembersTextBlock" Text="Owners (0), Members (0) and Guests (0)" FontSize="16"/>
+                                        <DataGrid x:Name="teamMembersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="530" SelectionMode="Single" Width="1025">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
                                                 <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True" MinWidth="100" Width="Auto"/>
                                                 <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" MinWidth="100" Width="Auto" />
+                                                <DataGridTextColumn Header="Role" Binding="{Binding role}" IsReadOnly="True" MinWidth="100" Width="Auto"/>
                                                 <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" MinWidth="100" Width="Auto" />
                                                 <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" MinWidth="100" Width="*" />
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <Button x:Name="addTeamMemberButton" Content="Add Member"/>
+                                            <Button x:Name="editTeamMemberButton" Content="Edit Member"/>
                                             <Button x:Name="removeTeamMemberButton" Content="Remove Member"/>
-                                        </StackPanel>
-                                        <TextBlock x:Name="teamOwnersTextBlock" Text="Owners (0):" Margin="0,5,0,0" FontSize="16"/>
-                                        <DataGrid x:Name="teamOwnersDataGrid" AutoGenerateColumns="False" Margin="0,10" Height="220" SelectionMode="Single" Width="1025">
-                                            <DataGrid.Columns>
-                                                <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
-                                                <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True" MinWidth="100" Width="Auto"/>
-                                                <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" MinWidth="100" Width="Auto"/>
-                                                <DataGridTextColumn Header="User Name" Binding="{Binding userPrincipalName}" IsReadOnly="True" MinWidth="100" Width="Auto"/>
-                                                <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" MinWidth="100" Width="*"/>
-                                            </DataGrid.Columns>
-                                        </DataGrid>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Button x:Name="addTeamOwnerButton" Content="Add Owner"/>
-                                            <Button x:Name="removeTeamOwnerButton" Content="Remove Owner"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </TabItem>
@@ -1350,9 +1342,8 @@ function ValidateRegex {
 
 }
 
-function GetTeamInformation {
+ function GetTeamInformation {
     param (
-
 
     )
 
@@ -1419,38 +1410,10 @@ function GetTeamInformation {
         $script:mainWindow.teamDisplayNameTextBox.Text = $group.displayName
         $script:mainWindow.teamDescriptionTextBox.Text = $group.description
 
-        # Members #
-        ###########
-        $members = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members"
-        $totalMembers = (($members).value).Count
-        $script:mainWindow.totalTeamMembersTextBlock.Text = $totalMembers
-        $script:mainWindow.teamMembersTextBlock.Text = "Members ($totalMembers):"
-        $membersDataGrid = @()
-        $members.Value | ForEach-Object {
-
-            $member = @{
-
-                displayName       = $_.displayName
-                userPrincipalName = $_.userPrincipalName
-                jobTitle          = $_.jobTitle
-                officeLocation    = $_.officeLocation
-                id                = $_.id
-
-            }
-
-            $membersDataGrid += New-Object PSObject -Property $member
-
-        }
-
-        $script:mainWindow.teamMembersDataGrid.ItemsSource = $membersDataGrid
-
         # Owners #
         ##########
+        $membersDataGrid = @()
         $owners = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/owners"
-        $totalOwners = (($owners).value).Count
-        $script:mainWindow.totalTeamOwnersTextBlock.Text = $totalOwners
-        $script:mainWindow.teamOwnersTextBlock.Text = "Owners ($totalOwners):"
-        $ownersDataGrid = @()
         $owners.Value | ForEach-Object {
 
             $owner = @{
@@ -1460,25 +1423,56 @@ function GetTeamInformation {
                 jobTitle          = $_.jobTitle
                 officeLocation    = $_.officeLocation
                 id                = $_.id
+                role              = "Owner"
 
             }
 
-            $ownersDataGrid += New-Object PSObject -Property $owner
+            $membersDataGrid += New-Object PSObject -Property $owner
 
         }
 
-        $script:mainWindow.teamOwnersDataGrid.ItemsSource = $ownersDataGrid
-        # Disable delete owner button if one owner
-        if ($totalOwners -le 1) {
+        # Members #
+        ###########
+        $members = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members"
+        $members.Value | ForEach-Object {
 
-            $script:mainWindow.removeTeamOwnerButton.IsEnabled = $false
+            # Don't add if already an owner
+            if ($membersDataGrid.id -notcontains $_.id) {
+
+                $member = @{
+
+                    displayName       = $_.displayName
+                    userPrincipalName = $_.userPrincipalName
+                    jobTitle          = $_.jobTitle
+                    officeLocation    = $_.officeLocation
+                    id                = $_.id
+                    role              = $_.UserType
+    
+                }
+    
+                $membersDataGrid += New-Object PSObject -Property $member
+
+            }
+
+        }   
+
+        # Member Totals
+        $totalMembers = ($membersDataGrid | Where-Object { $_.role -eq "Member" } | Measure-Object).Count
+        $script:mainWindow.totalTeamMembersTextBlock.Text = $totalMembers     
+        $totalOwners = ($membersDataGrid | Where-Object { $_.role -eq "Owner" } | Measure-Object).Count
+        $script:mainWindow.totalTeamOwnersTextBlock.Text = $totalOwners
+        $totalGuests = ($membersDataGrid | Where-Object { $_.role -eq "Guest" } | Measure-Object).Count
+        $script:mainWindow.totalTeamGuestsTextBlock.Text = $totalGuests
+        $script:mainWindow.teamMembersTextBlock.Text = "Owners ($totalOwners), Members ($totalMembers) and Guests ($totalGuests)"
+
+        # Sort Datagrid
+        if ($membersDataGrid.Count -gt 1) {
+            
+            $membersDataGrid = $membersDataGrid | Sort-Object -Property DisplayName
 
         }
-        else {
 
-            $script:mainWindow.removeTeamOwnerButton.IsEnabled = $true
-
-        }
+        $script:mainWindow.teamMembersDataGrid.ItemsSource = $membersDataGrid
 
         # Channels #
         ############
@@ -1592,7 +1586,7 @@ function GetTabInformation {
         #######
         $tab = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$script:currentTeamId/channels/$script:currentChannelId/tabs/$script:currentTabId"
         $script:mainWindow.tabTeamsAppIdTextBox.Text = $tab.teamsAppId
-        $script:mainWindow.tabDisplayNameTextBox.Text = $tab.displayName
+        $script:mainWindow.tabDisplayNameTextBox.Text = [System.Web.HttpUtility]::UrlDecode($tab.displayName)
         $script:mainWindow.tabEntityIdTextBox.Text = $tab.configuration.entityId
         $script:mainWindow.tabContentUrlTextBox.Text = $tab.configuration.contentUrl
         $script:mainWindow.tabRemoveUrlTextBox.Text = $tab.configuration.removeUrl
@@ -4203,8 +4197,6 @@ function UpdateTab {
 function AddUserToTeam {
     param (
 
-        [Parameter(mandatory = $true)][ValidateSet('member', 'owner')][string]$type
-
     )
     
     # Load Window
@@ -4217,9 +4209,159 @@ function AddUserToTeam {
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="AddUserWindow"
-    Title="Add User" SizeToContent="WidthAndHeight" FontSize="13.5"
+    Title="Add Member" SizeToContent="WidthAndHeight" FontSize="13.5"
     >
     <Window.Resources>
+        <!-- Inspired from https://stackoverflow.com/questions/22673483/how-do-i-create-a-flat-combo-box-using-wpf -->
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="32" />
+                </Grid.ColumnDefinitions>
+                <Border
+                  x:Name="Border" 
+                  Grid.ColumnSpan="2"
+                  Height="30"
+                  CornerRadius="3"
+                  BorderBrush="#DFDEDE"
+                  Background="White"
+                  BorderThickness="1" />
+                <Border 
+                  Grid.Column="0"
+                  CornerRadius="3,0,0,3" 
+                  Margin="1"
+                 
+                  />
+                <Path 
+                  x:Name="Arrow"
+                  Grid.Column="1"     
+                  Fill="#6264A7"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
+                    Width="24"
+                    Height="24"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter TargetName="Border" Property="Background" Value="#F3F2F1" />
+                    <Setter TargetName="Border" Property="BorderBrush" Value="#DFDEDE" />
+                    <Setter Property="Foreground" Value="#252424"/>
+                    <Setter TargetName="Arrow" Property="Fill" Value="#DFDEDE" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
+            <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
+        </ControlTemplate>
+        <Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="MinWidth" Value="120"/>
+            <Setter Property="MinHeight" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton 
+                            Name="ToggleButton" 
+                            Template="{StaticResource ComboBoxToggleButton}" 
+                            Grid.Column="2" 
+                            Focusable="false"
+                            IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                            ClickMode="Press">
+                            </ToggleButton>
+                            <ContentPresenter
+                            Name="ContentSite"
+                            IsHitTestVisible="False" 
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                            Margin="8,3,28,3"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left" />
+                            <TextBox x:Name="PART_EditableTextBox"
+                            Style="{x:Null}" 
+                            Template="{StaticResource ComboBoxTextBox}" 
+                            HorizontalAlignment="Left" 
+                            VerticalAlignment="Center"
+                            Focusable="True" 
+                            Background="Transparent"
+                            Visibility="Hidden"
+                            />
+                            <Popup 
+                            Name="Popup"
+                            Placement="Bottom"
+                            IsOpen="{TemplateBinding IsDropDownOpen}"
+                            AllowsTransparency="True" 
+                            Focusable="False"
+                            PopupAnimation="Slide">
+                                <Grid 
+                                  Name="DropDown"
+                                  SnapsToDevicePixels="True"                
+                                  MinWidth="{TemplateBinding ActualWidth}"
+                                  MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border 
+                                    x:Name="DropDownBorder"
+                                    Background="White"
+                                    BorderThickness="1"
+                                    BorderBrush="#DFDEDE"
+                                    CornerRadius="3"    
+                                        />
+                                    <ScrollViewer Margin="0,5" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
+                            </Trigger>
+                            <Trigger Property="IsGrouping" Value="true">
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable" Value="true">
+                                <Setter Property="IsTabStop" Value="false"/>
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border 
+                      Name="Border"
+                      Padding="8,5"
+                      SnapsToDevicePixels="true">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#E2E2F6" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#252424"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!---->
         <Style TargetType="{x:Type Button}">
             <Setter Property="Background" Value="#6264A7" />
             <Setter Property="Foreground" Value="White" />
@@ -4300,6 +4442,10 @@ function AddUserToTeam {
             <TextBox x:Name="userTextBox" TextWrapping="Wrap" Margin="5,0" Width="400"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,2">
+            <TextBlock Text="Role:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+            <ComboBox x:Name="roleComboBox" MinWidth="150" Margin="5,0" VerticalAlignment="Center" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,2">
             <TextBlock Text="Name:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
             <TextBlock x:Name="userDisplayNameTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
         </StackPanel>
@@ -4335,6 +4481,13 @@ function AddUserToTeam {
         }
 
     }
+
+    # Populate UI
+    # Role
+    $roles = @("Member", "Owner") | Sort-Object
+    $window.roleComboBox.ItemsSource = $roles
+    $window.roleComboBox.SelectedItem = "Member"
+
 
     # Events
     # User text changed
@@ -4389,21 +4542,25 @@ function AddUserToTeam {
 
                 $body = @{ "@odata.id" = "https://graph.microsoft.com/beta/users/$($user.id)" }
 
-                # Add User
-                InvokeGraphAPICall -method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/$type`s/`$ref" -body $body
+                # Role of user
+                $role = $window.roleComboBox.SelectedItem
 
-                # Check if success
-                if ($script:lastAPICallSuccess -eq $true) {
+                # If an Owner
+                if ($role -eq "Owner") {
 
-                    OKPrompt -messageBody "$($user.displayname) has been added as a $type to the Team." -messageTitle "User Added To Team"
+                    # Add as Owner
+                    InvokeGraphAPICall -method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/owners/`$ref" -body $body -silent
+    
+                }
 
-                    # Refresh Team
-                    GetTeamInformation
+                # Add as Member
+                InvokeGraphAPICall -method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members/`$ref" -body $body -silent
 
-                    # Close Window
-                    $window.AddUserWindow.Close()
+                # Refresh Team
+                GetTeamInformation
 
-                } 
+                # Close Window
+                $window.AddUserWindow.Close()
 
             }
 
@@ -4423,12 +4580,359 @@ function AddUserToTeam {
 
 }
 
+function EditUserInTeam {
+    param (
+
+        [Parameter(mandatory = $true)][PSCustomObject]$user
+
+    )
+    
+    # Load Window
+    # Declare Objects
+    $window = @{ }
+
+    # Load XAML
+    [xml]$xaml = @"
+    <Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="EditUserWindow"
+    Title="Edit Member" SizeToContent="WidthAndHeight" FontSize="13.5"
+    >
+    <Window.Resources>
+        <!-- Inspired from https://stackoverflow.com/questions/22673483/how-do-i-create-a-flat-combo-box-using-wpf -->
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="32" />
+                </Grid.ColumnDefinitions>
+                <Border
+                  x:Name="Border" 
+                  Grid.ColumnSpan="2"
+                  Height="30"
+                  CornerRadius="3"
+                  BorderBrush="#DFDEDE"
+                  Background="White"
+                  BorderThickness="1" />
+                <Border 
+                  Grid.Column="0"
+                  CornerRadius="3,0,0,3" 
+                  Margin="1"
+                 
+                  />
+                <Path 
+                  x:Name="Arrow"
+                  Grid.Column="1"     
+                  Fill="#6264A7"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"
+                    Width="24"
+                    Height="24"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter TargetName="Border" Property="Background" Value="#F3F2F1" />
+                    <Setter TargetName="Border" Property="BorderBrush" Value="#DFDEDE" />
+                    <Setter Property="Foreground" Value="#252424"/>
+                    <Setter TargetName="Arrow" Property="Fill" Value="#DFDEDE" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
+            <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
+        </ControlTemplate>
+        <Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="MinWidth" Value="120"/>
+            <Setter Property="MinHeight" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton 
+                            Name="ToggleButton" 
+                            Template="{StaticResource ComboBoxToggleButton}" 
+                            Grid.Column="2" 
+                            Focusable="false"
+                            IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                            ClickMode="Press">
+                            </ToggleButton>
+                            <ContentPresenter
+                            Name="ContentSite"
+                            IsHitTestVisible="False" 
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                            Margin="8,3,28,3"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left" />
+                            <TextBox x:Name="PART_EditableTextBox"
+                            Style="{x:Null}" 
+                            Template="{StaticResource ComboBoxTextBox}" 
+                            HorizontalAlignment="Left" 
+                            VerticalAlignment="Center"
+                            Focusable="True" 
+                            Background="Transparent"
+                            Visibility="Hidden"
+                            />
+                            <Popup 
+                            Name="Popup"
+                            Placement="Bottom"
+                            IsOpen="{TemplateBinding IsDropDownOpen}"
+                            AllowsTransparency="True" 
+                            Focusable="False"
+                            PopupAnimation="Slide">
+                                <Grid 
+                                  Name="DropDown"
+                                  SnapsToDevicePixels="True"                
+                                  MinWidth="{TemplateBinding ActualWidth}"
+                                  MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border 
+                                    x:Name="DropDownBorder"
+                                    Background="White"
+                                    BorderThickness="1"
+                                    BorderBrush="#DFDEDE"
+                                    CornerRadius="3"    
+                                        />
+                                    <ScrollViewer Margin="0,5" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
+                            </Trigger>
+                            <Trigger Property="IsGrouping" Value="true">
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable" Value="true">
+                                <Setter Property="IsTabStop" Value="false"/>
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border 
+                      Name="Border"
+                      Padding="8,5"
+                      SnapsToDevicePixels="true">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#E2E2F6" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#252424"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!---->
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#6264A7" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="MinWidth" Value="100" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="3" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#464775" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#33344A" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#BDBDBD" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="#252424" />
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Foreground" Value="#252424" />
+            <Setter Property="BorderBrush" Value="#DFDEDE" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Margin" Value="5,0" />
+            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border CornerRadius="3" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                        >
+                            <ScrollViewer x:Name="PART_ContentHost" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#6264A7" />
+                                <Setter Property="BorderThickness" Value="1" />
+                            </Trigger>
+                            <Trigger Property="IsReadOnly" Value="True">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#F3F2F1" />
+                                <Setter Property="Foreground" Value="#717070" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+<StackPanel Orientation="Vertical" Margin="10">
+        <StackPanel Orientation="Horizontal" Margin="0,2">
+            <TextBlock Text="Name:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+            <TextBlock x:Name="userDisplayNameTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,2">
+            <TextBlock Text="Title:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+            <TextBlock x:Name="userJobTitleTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,2">
+            <TextBlock Text="Location:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+            <TextBlock x:Name="userLocationTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+        </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,2">
+            <TextBlock Text="Role:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+            <ComboBox x:Name="roleComboBox" MinWidth="150" Margin="5,0" VerticalAlignment="Center" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <Button x:Name="saveButton" Content="Save" Margin="10" Width="100"/>
+        <Button x:Name="cancelButton" Content="Cancel" Margin="10" Width="100"/>
+    </StackPanel>
+</StackPanel>
+</Window>
+"@
+
+    # Feed XAML in to XMLNodeReader
+    $XMLReader = (New-Object System.Xml.XmlNodeReader $xaml)
+
+    # Create a Window Object
+    $WindowObject = [Windows.Markup.XamlReader]::Load($XMLReader)
+
+    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object {
+
+        try {
+            $window.Add($_.Name, $WindowObject.FindName($_.Name))
+        }
+        catch {
+
+        }
+
+    }
+
+    if ($user.id) {
+
+        # Populate UI
+        $roles = @("Member", "Owner") | Sort-Object
+        $window.roleComboBox.ItemsSource = $roles
+        $window.roleComboBox.SelectedItem = $user.role
+
+        $window.userDisplayNameTextBlock.Text = $user.displayName
+        $window.userJobTitleTextBlock.Text = $user.jobTitle
+        $window.userLocationTextBlock.Text = $user.officeLocation
+
+    }
+
+    # Events
+
+    # Add User Clicked
+    $window.saveButton.add_Click( {
+
+            if ($user.id) {
+
+                $body = @{ "@odata.id" = "https://graph.microsoft.com/beta/users/$($user.id)" }
+
+                # If an Owner
+                if ($window.roleComboBox.SelectedItem -eq "Owner") {
+
+                    # Add as Owner
+                    InvokeGraphAPICall -method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/owners/`$ref" -body $body -silent
+
+                }
+                elseif ($window.roleComboBox.SelectedItem -eq "Member") {
+                    
+                    # Delete as owner (just in case)
+                    InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/owners/$($user.id)/`$ref" -silent
+
+                }
+
+                # Add as Member
+                InvokeGraphAPICall -method "POST" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members/`$ref" -body $body -silent
+            
+                # Refresh Team
+                GetTeamInformation
+
+                # Close Window
+                $window.EditUserWindow.Close()
+
+            }
+
+        })
+
+    # Cancel Clicked
+    $window.cancelButton.add_Click( {
+    
+            # Close Window
+            $window.EditUserWindow.Close()
+
+        })
+
+    # Show Window
+    $window.EditUserWindow.ShowDialog()
+
+}
+
 function RemoveUserFromTeam {
 
     param (
 
-        [Parameter(mandatory = $true)][PSCustomObject]$user,
-        [Parameter(mandatory = $true)][ValidateSet('member', 'owner')][string]$type
+        [Parameter(mandatory = $true)][PSCustomObject]$user
 
     )
 
@@ -4438,7 +4942,7 @@ function RemoveUserFromTeam {
         # Confirm deletion
         $buttonType = [System.Windows.MessageBoxButton]::YesNo
         $messageIcon = [System.Windows.MessageBoxImage]::Question
-        $messageBody = "Are you sure you want to remove '$($user.displayName)' as a $type of this Team?"
+        $messageBody = "Are you sure you want to remove '$($user.displayName)' as a $($user.role) of this Team?"
         $messageTitle = "Confirm Removal"
  
         $result = [System.Windows.MessageBox]::Show($messageBody, $messageTitle, $buttonType, $messageIcon)
@@ -4446,8 +4950,9 @@ function RemoveUserFromTeam {
         # If yes
         if ($result -eq "Yes") {
 
-            # Remove user from Team
-            InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/$type`s/$($user.id)/`$ref"
+            # Remove as Member and Owner from Team
+            InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members/$($user.id)/`$ref" -silent
+            InvokeGraphAPICall -Method "DELETE" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/owners/$($user.id)/`$ref" -silent
 
             # Reload Team
             GetTeamInformation
@@ -4948,36 +5453,44 @@ $script:mainWindow.cloneTeamButton.add_Click( {
 # Add Member clicked
 $script:mainWindow.addTeamMemberButton.add_Click( {
 
-        AddUserToTeam -type member
+        AddUserToTeam
 
     })
 
-# Add Owner clicked
-$script:mainWindow.addTeamOwnerButton.add_Click( {
+# Edit Member clicked
+$script:mainWindow.editTeamMemberButton.add_Click( {
 
-        AddUserToTeam -type owner
+    if ($script:mainWindow.teamMembersDataGrid.SelectedItem.Role -eq "Owner" -or $script:mainWindow.teamMembersDataGrid.SelectedItem.Role -eq "Member") {
+        
+        EditUserInTeam -user $script:mainWindow.teamMembersDataGrid.SelectedItem
 
-    })
+    }
+
+})
 
 # Remove Member clicked
 $script:mainWindow.removeTeamMemberButton.add_Click( {
-    
-        # Get Current Selection
-        $selectedItem = $script:mainWindow.teamMembersDataGrid.SelectedItem
 
-        RemoveUserFromTeam -user $selectedItem -type member
+        RemoveUserFromTeam -user $script:mainWindow.teamMembersDataGrid.SelectedItem
 
     })
 
-# Remove Owner clicked
-$script:mainWindow.removeTeamOwnerButton.add_Click( {
-    
-        # Get Current Selection
-        $selectedItem = $script:mainWindow.teamOwnersDataGrid.SelectedItem
+# Member Datagrid Selection Changed
+$script:mainWindow.teamMembersDataGrid.add_SelectionChanged({
 
-        RemoveUserFromTeam -user $selectedItem -type owner
+    if ($script:mainWindow.teamMembersDataGrid.SelectedItem.Role -eq "Guest") {
 
-    })
+        # Disable Edit Button
+        $script:mainWindow.editTeamMemberButton.IsEnabled = $false
+
+    } else {
+
+        # Enable Edit Button
+        $script:mainWindow.editTeamMemberButton.IsEnabled = $true
+
+    }
+
+})
 
 # Update Team clicked
 $script:mainWindow.updateTeamButton.add_Click( {
