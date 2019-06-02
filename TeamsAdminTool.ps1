@@ -5292,95 +5292,100 @@ function TeamsReport {
     $saveAs.Filter = "CSV|*.csv"
     $saveAs.ShowDialog()
 
-    # Warn can take a while
-    OKPrompt -messageBody "Click OK to start compiling report - check PowerShell console for progress.`n`rThis may take some time, please be patient." -messageTitle "Please Wait"
+    # Check if a filename provided
+    if ($saveAs.Filename) {
 
-    # Get all groups that are Teams
-    $groups = InvokeGraphAPICall -method "GET" -uri "https://graph.microsoft.com/beta/groups?`$filter=resourceProvisioningOptions/Any(x:x eq 'Team')" -silent
-    $totalGroups = (($groups).value).Count
+        # Warn can take a while
+        OKPrompt -messageBody "Click OK to start compiling report - check PowerShell console for progress.`n`rThis may take some time, please be patient." -messageTitle "Please Wait"
 
-    $groups.value | ForEach-Object {
+        # Get all groups that are Teams
+        $groups = InvokeGraphAPICall -method "GET" -uri "https://graph.microsoft.com/beta/groups?`$filter=resourceProvisioningOptions/Any(x:x eq 'Team')" -silent
+        $totalGroups = (($groups).value).Count
 
-        # Progress counter
-        $counter++
+        $groups.value | ForEach-Object {
 
-        # Progress
-        Write-Progress -Activity "Compiling Report" -Status "Processing Team $counter of $totalGroups" -CurrentOperation $_.displayName -PercentComplete (($counter / $totalGroups) * 100)
+            # Progress counter
+            $counter++
 
-        # More info from Graph
-        $team = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$($_.id)" -silent
-        $members = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$($_.id)/members" -silent
-        $owners = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$($_.id)/owners" -silent
-        $channels = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$($_.id)/channels" -silent
+            # Progress
+            Write-Progress -Activity "Compiling Report" -Status "Processing Team $counter of $totalGroups" -CurrentOperation $_.displayName -PercentComplete (($counter / $totalGroups) * 100)
 
-        $teamsObject = @{
+            # More info from Graph
+            $team = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$($_.id)" -silent
+            $members = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$($_.id)/members" -silent
+            $owners = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$($_.id)/owners" -silent
+            $channels = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$($_.id)/channels" -silent
 
-            # General
-            Id                                = $_.id
-            DisplayName                       = $_.displayName
-            Description                       = $_.description
-            Mail                              = $_.mail
-            Visibility                        = $_.visibility
-            CreatedDateTime                   = $_.createdDateTime
-            ExpirationDateTime                = $_.expirationDateTime
-            Archived                          = $team.isArchived
+            $teamsObject = @{
 
-            # Member Settings
-            AllowCreateUpdateChannels         = $team.memberSettings.allowCreateUpdateChannels
-            AllowDeleteChannels               = $team.memberSettings.allowDeleteChannels
-            AllowAddRemoveApps                = $team.memberSettings.allowAddRemoveApps
-            AllowCreateUpdateRemoveTabs       = $team.memberSettings.allowCreateUpdateRemoveTabs
-            AllowCreateUpdateRemoveConnectors = $team.memberSettings.allowCreateUpdateRemoveConnectors
+                # General
+                Id                                = $_.id
+                DisplayName                       = $_.displayName
+                Description                       = $_.description
+                Mail                              = $_.mail
+                Visibility                        = $_.visibility
+                CreatedDateTime                   = $_.createdDateTime
+                ExpirationDateTime                = $_.expirationDateTime
+                Archived                          = $team.isArchived
 
-            # Guest Settings
-            AllowGuestCreateUpdateChannels    = $team.guestSettings.allowCreateUpdateChannels
-            AllowGuestDeleteChannels          = $team.guestSettings.allowDeleteChannels
+                # Member Settings
+                AllowCreateUpdateChannels         = $team.memberSettings.allowCreateUpdateChannels
+                AllowDeleteChannels               = $team.memberSettings.allowDeleteChannels
+                AllowAddRemoveApps                = $team.memberSettings.allowAddRemoveApps
+                AllowCreateUpdateRemoveTabs       = $team.memberSettings.allowCreateUpdateRemoveTabs
+                AllowCreateUpdateRemoveConnectors = $team.memberSettings.allowCreateUpdateRemoveConnectors
 
-            # Messaging Settings
-            AllowUserEditMessages             = $team.messagingSettings.allowUserEditMessages
-            AllowUserDeleteMessages           = $team.messagingSettings.allowUserDeleteMessages
-            AllowOwnerDeleteMessages          = $team.messagingSettings.allowOwnerDeleteMessages
-            AllowTeamMentions                 = $team.messagingSettings.allowTeamMentions
-            AllowChannelMentions              = $team.messagingSettings.allowChannelMentions
+                # Guest Settings
+                AllowGuestCreateUpdateChannels    = $team.guestSettings.allowCreateUpdateChannels
+                AllowGuestDeleteChannels          = $team.guestSettings.allowDeleteChannels
 
-            # Fun Settings
-            AllowGiphy                        = $team.funSettings.allowGiphy
-            GiphyContentRating                = $team.funSettings.giphyContentRating
-            AllowStickersAndMemes             = $team.funSettings.allowStickersAndMemes
-            AllowCustomMemes                  = $team.funSettings.allowCustomMemes
+                # Messaging Settings
+                AllowUserEditMessages             = $team.messagingSettings.allowUserEditMessages
+                AllowUserDeleteMessages           = $team.messagingSettings.allowUserDeleteMessages
+                AllowOwnerDeleteMessages          = $team.messagingSettings.allowOwnerDeleteMessages
+                AllowTeamMentions                 = $team.messagingSettings.allowTeamMentions
+                AllowChannelMentions              = $team.messagingSettings.allowChannelMentions
 
-            # Discovery Settings
-            ShowInTeamsSearchAndSuggestions   = $team.discoverySettings.showInTeamsSearchAndSuggestions
+                # Fun Settings
+                AllowGiphy                        = $team.funSettings.allowGiphy
+                GiphyContentRating                = $team.funSettings.giphyContentRating
+                AllowStickersAndMemes             = $team.funSettings.allowStickersAndMemes
+                AllowCustomMemes                  = $team.funSettings.allowCustomMemes
 
-            # Totals
-            NumberChannels                    = (($channels).value).Count
-            NumberOwners                      = (($owners).value).Count
-            NumberMembers                     = (($members).value).Count
+                # Discovery Settings
+                ShowInTeamsSearchAndSuggestions   = $team.discoverySettings.showInTeamsSearchAndSuggestions
+
+                # Totals
+                NumberChannels                    = (($channels).value).Count
+                NumberOwners                      = (($owners).value).Count
+                NumberMembers                     = (($members).value).Count
+
+            }
+
+            $teamsReport += New-Object PSObject -Property $teamsObject
 
         }
 
-        $teamsReport += New-Object PSObject -Property $teamsObject
+        # Progress Complete
+        Write-Progress -Activity "Compiling Report" -Completed
+
+        if ($teamsReport) {
+
+            try {
+            
+                $teamsReport | Export-CSV -Path $saveAs.Filename -NoTypeInformation
+                OKPrompt -messageBody "Report completed and saved at $($saveAs.Filename)." -messageTitle "Report Completed"
+
+            }
+            catch {
+
+                ErrorPrompt -messageBody "Unable to save report at $($saveAs.Filename)." -messageTitle "Unable To Save Report"
+
+            }
+
+        }   
 
     }
-
-    # Progress Complete
-    Write-Progress -Activity "Compiling Report" -Completed
-
-    if ($teamsReport) {
-
-        try {
-            
-            $teamsReport | Export-CSV -Path $saveAs.Filename -NoTypeInformation
-            OKPrompt -messageBody "Report completed and saved at $($saveAs.Filename)." -messageTitle "Report Completed"
-
-        }
-        catch {
-
-            ErrorPrompt -messageBody "Unable to save report at $($saveAs.Filename)." -messageTitle "Unable To Save Report"
-
-        }
-
-    }   
 
 }
 
