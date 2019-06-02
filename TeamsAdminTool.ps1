@@ -2110,183 +2110,185 @@ function AddTeam {
             </Setter>
         </Style>
     </Window.Resources>
-    <StackPanel Orientation="Vertical">
-        <StackPanel Orientation="Vertical" Margin="10,0">
-            <GroupBox Header="Standard Team" Margin="0,5">
-                <StackPanel Orientation="Vertical" Margin="10">
-                    <RadioButton x:Name="standardTeamRadioButton" Content="Create a Standard Team" GroupName="teamType" IsChecked="True" Margin="0,0,0,10"/>
-                    <Expander Header="General" IsExpanded="True">
-                        <StackPanel Orientation="Vertical" Margin="5">
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                <TextBox x:Name="teamNameTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
-                                <TextBox x:Name="teamDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock Text="Privacy:" Width="120" VerticalAlignment="Center" TextAlignment="Right"/>
-                                <ComboBox x:Name="teamPrivacyComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="0,2">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" >
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Vertical" Margin="10,0">
+                <GroupBox Header="Standard Team" Margin="0,5">
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <RadioButton x:Name="standardTeamRadioButton" Content="Create a Standard Team" GroupName="teamType" IsChecked="True" Margin="0,0,0,10"/>
+                        <Expander Header="General" IsExpanded="True">
+                            <StackPanel Orientation="Vertical" Margin="5">
+                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                    <TextBlock Text="Name:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="teamNameTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                    <TextBlock Text="Description:" Width="120" TextAlignment="Right" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="teamDescriptionTextBox" Width="300" TextWrapping="Wrap" Margin="5,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                    <TextBlock Text="Privacy:" Width="120" VerticalAlignment="Center" TextAlignment="Right"/>
+                                    <ComboBox x:Name="teamPrivacyComboBox" MinWidth="100" VerticalAlignment="Center" Margin="5,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Margin="0,2">
                                 
-                                    <TextBlock Text="Owner:" Width="120" HorizontalAlignment="Left" TextAlignment="Right" Margin="0,5"/>
-                                    <StackPanel Orientation="Vertical">
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                                        <TextBlock Text="User (UPN):" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
-                                        <TextBox x:Name="userTextBox" TextWrapping="Wrap" Margin="5,0" Width="350"/>
+                                        <TextBlock Text="Owner:" Width="120" HorizontalAlignment="Left" TextAlignment="Right" Margin="0,5"/>
+                                        <StackPanel Orientation="Vertical">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                                            <TextBlock Text="User (UPN):" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+                                            <TextBox x:Name="userTextBox" TextWrapping="Wrap" Margin="5,0" Width="350"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                                            <TextBlock Text="Name:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="userDisplayNameTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                                            <TextBlock Text="Title:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="userJobTitleTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                                            <TextBlock Text="Location:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="userLocationTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button x:Name="addTeamOwnerButton" Content="Add Owner" Margin="5,0" IsEnabled="False"/>
+                                        </StackPanel>
+                                        <DataGrid x:Name="teamOwnersDataGrid" AutoGenerateColumns="False" Margin="0,5" MinHeight="50" SelectionMode="Single" AlternatingRowBackground="#FFE5E5F1" AlternationCount="2" GridLinesVisibility="None">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
+                                                <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
+                                                <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
+                                                <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock Text="Name:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
-                                        <TextBlock x:Name="userDisplayNameTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock Text="Title:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
-                                        <TextBlock x:Name="userJobTitleTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock Text="Location:" Width="70" TextAlignment="Right" VerticalAlignment="Center"/>
-                                        <TextBlock x:Name="userLocationTextBlock" TextWrapping="Wrap" Margin="5,0" Width="200"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <Button x:Name="addTeamOwnerButton" Content="Add Owner" Margin="5,0" IsEnabled="False"/>
-                                    </StackPanel>
-                                    <DataGrid x:Name="teamOwnersDataGrid" AutoGenerateColumns="False" Margin="0,5" MinHeight="50" SelectionMode="Single" AlternatingRowBackground="#FFE5E5F1" AlternationCount="2" GridLinesVisibility="None">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Name" Binding="{Binding displayName}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="Title" Binding="{Binding jobTitle}" IsReadOnly="True" />
-                                            <DataGridTextColumn Header="Location" Binding="{Binding officeLocation}" IsReadOnly="True" />
-                                            <DataGridTextColumn Binding="{Binding id}" IsReadOnly="True" Visibility="Hidden"/>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </StackPanel>
-                                </StackPanel>
                                 
-                        </StackPanel>
-                    </Expander>
-                    <Expander Header="Additional Channels">
-                        <StackPanel Orientation="Vertical" Margin="30,10">
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel Orientation="Vertical" Margin="5,0,0,0">
-                                    <Label Content="Name:"/>
-                                    <TextBox x:Name="teamChannelDisplayName1TextBox" Width="150" Margin="0,2" Height="22"/>
-                                    <TextBox x:Name="teamChannelDisplayName2TextBox" Width="150" Margin="0,2" Height="22"/>
-                                    <TextBox x:Name="teamChannelDisplayName3TextBox" Width="150" Margin="0,2" Height="22"/>
-                                    <TextBox x:Name="teamChannelDisplayName4TextBox" Width="150" Margin="0,2" Height="22"/>
-                                    <TextBox x:Name="teamChannelDisplayName5TextBox" Width="150" Margin="0,2" Height="22"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Vertical" Margin="5,0,0,0">
-                                    <Label Content="Description:"/>
-                                    <TextBox x:Name="teamChannelDescription1TextBox" Width="150" Margin="0,2" Height="22"/>
-                                    <TextBox x:Name="teamChannelDescription2TextBox" Width="150" Margin="0,2" Height="22"/>
-                                    <TextBox x:Name="teamChannelDescription3TextBox" Width="150" Margin="0,2" Height="22"/>
-                                    <TextBox x:Name="teamChannelDescription4TextBox" Width="150" Margin="0,2" Height="22"/>
-                                    <TextBox x:Name="teamChannelDescription5TextBox" Width="150" Margin="0,2" Height="22"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Vertical" Margin="5,0,0,0">
-                                    <Label Content="Is Favourite:"/>
-                                    <CheckBox x:Name="teamChannelFavourite1CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelFavourite2CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelFavourite3CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelFavourite4CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelFavourite5CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Vertical" Margin="5,0,0,0">
-                                    <Label Content="Wiki:"/>
-                                    <CheckBox x:Name="teamChannelWiki1CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelWiki2CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelWiki3CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelWiki4CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelWiki5CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Vertical" Margin="5,0,0,0">
-                                    <Label Content="OneNote:"/>
-                                    <CheckBox x:Name="teamChannelOneNote1CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelOneNote2CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelOneNote3CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelOneNote4CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                    <CheckBox x:Name="teamChannelOneNote5CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
-                                </StackPanel>
                             </StackPanel>
-                        </StackPanel>
-                    </Expander>
-                    <Expander Header="Member Settings">
-                        <StackPanel Orientation="Horizontal" Margin="30,10">
-                            <StackPanel Orientation="Vertical">
-                                <CheckBox x:Name="allowCreateUpdateChannelsCheckBox" Content="Create/Update Channels" IsChecked="True"/>
-                                <CheckBox x:Name="allowDeleteChannelsCheckBox" Content="Delete Channels" IsChecked="True"/>
-                                <CheckBox x:Name="allowAddRemoveAppsCheckBox" Content="Add/Remove Apps" IsChecked="True"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="10,0,0,0">
-                                <CheckBox x:Name="allowCreateUpdateRemoveTabsCheckBox" Content="Create/Update/Remove Tabs" IsChecked="True"/>
-                                <CheckBox x:Name="allowCreateUpdateRemoveConnectorsCheckBox" Content="Create/Update/Remove Connectors" IsChecked="True"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Expander>
-                    <Expander Header="Guest Settings">
-                        <StackPanel Orientation="Horizontal" Margin="30,10">
-                            <StackPanel Orientation="Vertical">
-                                <CheckBox x:Name="allowGuestCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="10,0,0,0">
-                                <CheckBox x:Name="allowGuestDeleteChannelsCheckBox" Content="Delete Channels"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Expander>
-                    <Expander Header="Messaging Settings">
-                        <StackPanel Orientation="Horizontal" Margin="30,10">
-                            <StackPanel Orientation="Vertical">
-                                <CheckBox x:Name="allowUserEditMessagesCheckBox" Content="Members Edit Messages" IsChecked="True"/>
-                                <CheckBox x:Name="allowUserDeleteMessagesCheckBox" Content="Members Delete Messages" IsChecked="True"/>
-                                <CheckBox x:Name="allowOwnerDeleteMessagesCheckBox" Content="Owners Delete Messages" IsChecked="True"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="10,0,0,0">
-                                <CheckBox x:Name="allowTeamMentionsCheckBox" Content="Team Mentions" IsChecked="True"/>
-                                <CheckBox x:Name="allowChannelMentionsCheckBox" Content="Channel Mentions" IsChecked="True"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Expander>
-                    <Expander Header="Fun Settings">
-                        <StackPanel Orientation="Horizontal" Margin="30,10">
-                            <StackPanel Orientation="Vertical">
-                                <CheckBox x:Name="allowGiphyCheckBox" Content="Allow Giphy" IsChecked="True"/>
+                        </Expander>
+                        <Expander Header="Additional Channels">
+                            <StackPanel Orientation="Vertical" Margin="30,10">
                                 <StackPanel Orientation="Horizontal">
-                                    <Label Content="Giphy Rating:"/>
-                                    <ComboBox x:Name="giphyContentRatingComboBox" MinWidth="100" Margin="5,0,0,0"/>
+                                    <StackPanel Orientation="Vertical" Margin="5,0,0,0">
+                                        <Label Content="Name:"/>
+                                        <TextBox x:Name="teamChannelDisplayName1TextBox" Width="150" Margin="0,2" Height="22"/>
+                                        <TextBox x:Name="teamChannelDisplayName2TextBox" Width="150" Margin="0,2" Height="22"/>
+                                        <TextBox x:Name="teamChannelDisplayName3TextBox" Width="150" Margin="0,2" Height="22"/>
+                                        <TextBox x:Name="teamChannelDisplayName4TextBox" Width="150" Margin="0,2" Height="22"/>
+                                        <TextBox x:Name="teamChannelDisplayName5TextBox" Width="150" Margin="0,2" Height="22"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical" Margin="5,0,0,0">
+                                        <Label Content="Description:"/>
+                                        <TextBox x:Name="teamChannelDescription1TextBox" Width="150" Margin="0,2" Height="22"/>
+                                        <TextBox x:Name="teamChannelDescription2TextBox" Width="150" Margin="0,2" Height="22"/>
+                                        <TextBox x:Name="teamChannelDescription3TextBox" Width="150" Margin="0,2" Height="22"/>
+                                        <TextBox x:Name="teamChannelDescription4TextBox" Width="150" Margin="0,2" Height="22"/>
+                                        <TextBox x:Name="teamChannelDescription5TextBox" Width="150" Margin="0,2" Height="22"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical" Margin="5,0,0,0">
+                                        <Label Content="Is Favourite:"/>
+                                        <CheckBox x:Name="teamChannelFavourite1CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelFavourite2CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelFavourite3CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelFavourite4CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelFavourite5CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical" Margin="5,0,0,0">
+                                        <Label Content="Wiki:"/>
+                                        <CheckBox x:Name="teamChannelWiki1CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelWiki2CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelWiki3CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelWiki4CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelWiki5CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical" Margin="5,0,0,0">
+                                        <Label Content="OneNote:"/>
+                                        <CheckBox x:Name="teamChannelOneNote1CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelOneNote2CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelOneNote3CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelOneNote4CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                        <CheckBox x:Name="teamChannelOneNote5CheckBox" HorizontalAlignment="Center" Margin="0,5"/>
+                                    </StackPanel>
                                 </StackPanel>
                             </StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="10,0,0,0">
-                                <CheckBox x:Name="allowStickersAndMemesCheckBox" Content="Allow Stickers and Memes" IsChecked="True"/>
-                                <CheckBox x:Name="allowCustomMemesCheckBox" Content="Allow Custom Memes" IsChecked="True"/>
+                        </Expander>
+                        <Expander Header="Member Settings">
+                            <StackPanel Orientation="Horizontal" Margin="30,10">
+                                <StackPanel Orientation="Vertical">
+                                    <CheckBox x:Name="allowCreateUpdateChannelsCheckBox" Content="Create/Update Channels" IsChecked="True"/>
+                                    <CheckBox x:Name="allowDeleteChannelsCheckBox" Content="Delete Channels" IsChecked="True"/>
+                                    <CheckBox x:Name="allowAddRemoveAppsCheckBox" Content="Add/Remove Apps" IsChecked="True"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Margin="10,0,0,0">
+                                    <CheckBox x:Name="allowCreateUpdateRemoveTabsCheckBox" Content="Create/Update/Remove Tabs" IsChecked="True"/>
+                                    <CheckBox x:Name="allowCreateUpdateRemoveConnectorsCheckBox" Content="Create/Update/Remove Connectors" IsChecked="True"/>
+                                </StackPanel>
                             </StackPanel>
-                        </StackPanel>
-                    </Expander>
-                    <Expander Header="Discovery Settings">
-                        <StackPanel Orientation="Horizontal" Margin="30,10">
-                            <StackPanel Orientation="Vertical">
-                                <CheckBox x:Name="showInTeamsSearchAndSuggestionsCheckBox" Content="Show In Teams Search and Suggestions" IsChecked="True" IsEnabled="False"/>
+                        </Expander>
+                        <Expander Header="Guest Settings">
+                            <StackPanel Orientation="Horizontal" Margin="30,10">
+                                <StackPanel Orientation="Vertical">
+                                    <CheckBox x:Name="allowGuestCreateUpdateChannelsCheckBox" Content="Create/Update Channels"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Margin="10,0,0,0">
+                                    <CheckBox x:Name="allowGuestDeleteChannelsCheckBox" Content="Delete Channels"/>
+                                </StackPanel>
                             </StackPanel>
-                        </StackPanel>
-                    </Expander>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Header="Custom Team" Margin="0,5">
-                <StackPanel Orientation="Vertical" Margin="10">
-                    <RadioButton x:Name="customTeamRadioButton" Content="Create a Custom Team using JSON" GroupName="teamType" IsChecked="False" Margin="0,0,0,10"/>
-                    <TextBlock Text="Example JSON for creating Teams can be found at the Graph API documentation:" FontStyle="Italic" Margin="10,0"/>
-                    <TextBlock Text="https://docs.microsoft.com/en-gb/graph/api/team-post?view=graph-rest-beta" Margin="10,0"/>
-                    <Expander Header="JSON" Margin="0,10">
-                        <TextBox x:Name="customJSONTextBox" MaxLines="30" MinLines="10" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" Margin="5"/>
-                    </Expander>
-                </StackPanel>
-            </GroupBox>
+                        </Expander>
+                        <Expander Header="Messaging Settings">
+                            <StackPanel Orientation="Horizontal" Margin="30,10">
+                                <StackPanel Orientation="Vertical">
+                                    <CheckBox x:Name="allowUserEditMessagesCheckBox" Content="Members Edit Messages" IsChecked="True"/>
+                                    <CheckBox x:Name="allowUserDeleteMessagesCheckBox" Content="Members Delete Messages" IsChecked="True"/>
+                                    <CheckBox x:Name="allowOwnerDeleteMessagesCheckBox" Content="Owners Delete Messages" IsChecked="True"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Margin="10,0,0,0">
+                                    <CheckBox x:Name="allowTeamMentionsCheckBox" Content="Team Mentions" IsChecked="True"/>
+                                    <CheckBox x:Name="allowChannelMentionsCheckBox" Content="Channel Mentions" IsChecked="True"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Expander>
+                        <Expander Header="Fun Settings">
+                            <StackPanel Orientation="Horizontal" Margin="30,10">
+                                <StackPanel Orientation="Vertical">
+                                    <CheckBox x:Name="allowGiphyCheckBox" Content="Allow Giphy" IsChecked="True"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Giphy Rating:"/>
+                                        <ComboBox x:Name="giphyContentRatingComboBox" MinWidth="100" Margin="5,0,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Margin="10,0,0,0">
+                                    <CheckBox x:Name="allowStickersAndMemesCheckBox" Content="Allow Stickers and Memes" IsChecked="True"/>
+                                    <CheckBox x:Name="allowCustomMemesCheckBox" Content="Allow Custom Memes" IsChecked="True"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Expander>
+                        <Expander Header="Discovery Settings">
+                            <StackPanel Orientation="Horizontal" Margin="30,10">
+                                <StackPanel Orientation="Vertical">
+                                    <CheckBox x:Name="showInTeamsSearchAndSuggestionsCheckBox" Content="Show In Teams Search and Suggestions" IsChecked="True" IsEnabled="False"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Expander>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Custom Team" Margin="0,5">
+                    <StackPanel Orientation="Vertical" Margin="10">
+                        <RadioButton x:Name="customTeamRadioButton" Content="Create a Custom Team using JSON" GroupName="teamType" IsChecked="False" Margin="0,0,0,10"/>
+                        <TextBlock Text="Example JSON for creating Teams can be found at the Graph API documentation:" FontStyle="Italic" Margin="10,0"/>
+                        <TextBlock Text="https://docs.microsoft.com/en-gb/graph/api/team-post?view=graph-rest-beta" Margin="10,0"/>
+                        <Expander Header="JSON" Margin="0,10">
+                            <TextBox x:Name="customJSONTextBox" MaxLines="30" MinLines="10" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" Margin="5"/>
+                        </Expander>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="addTeamButton" Content="Add" Margin="10"/>
+                <Button x:Name="cancelButton" Content="Cancel" Margin="10"/>
+            </StackPanel>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="addTeamButton" Content="Add" Margin="10"/>
-            <Button x:Name="cancelButton" Content="Cancel" Margin="10"/>
-        </StackPanel>
-    </StackPanel>
+    </ScrollViewer>
 </Window>
 "@
 
