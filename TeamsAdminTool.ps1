@@ -1453,51 +1453,9 @@ function GetTeamInformation {
         $script:mainWindow.teamDisplayNameTextBox.Text = $group.displayName
         $script:mainWindow.teamDescriptionTextBox.Text = $group.description
 
-        # Owners #
-        ##########
-        $membersDataGrid = @()
-        $owners = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/owners"
-        $owners.Value | ForEach-Object {
-
-            $owner = @{
-
-                displayName       = $_.displayName
-                userPrincipalName = $_.userPrincipalName
-                jobTitle          = $_.jobTitle
-                officeLocation    = $_.officeLocation
-                id                = $_.id
-                role              = "Owner"
-
-            }
-
-            $membersDataGrid += New-Object PSObject -Property $owner
-
-        }
-
         # Members #
         ###########
-        $members = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$script:currentTeamId/members"
-        $members.Value | ForEach-Object {
-
-            # Don't add if already an owner
-            if ($membersDataGrid.id -notcontains $_.id) {
-
-                $member = @{
-
-                    displayName       = $_.displayName
-                    userPrincipalName = $_.userPrincipalName
-                    jobTitle          = $_.jobTitle
-                    officeLocation    = $_.officeLocation
-                    id                = $_.id
-                    role              = $_.UserType
-    
-                }
-    
-                $membersDataGrid += New-Object PSObject -Property $member
-
-            }
-
-        }   
+        $membersDataGrid = GetTeamMembers -id $script:currentTeamId
 
         # Member Totals
         $totalMembers = ($membersDataGrid | Where-Object { $_.role -eq "Member" } | Measure-Object).Count
@@ -1554,6 +1512,64 @@ function GetTeamInformation {
         }
     
     }
+}
+
+function GetTeamMembers {
+
+    param (
+
+        [Parameter(mandatory = $true)][string]$id
+
+    )
+
+    # Owners #
+    ##########
+    $membersObject = @()
+    $owners = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$id/owners"
+    $owners.Value | ForEach-Object {
+
+        $owner = @{
+
+            displayName       = $_.displayName
+            userPrincipalName = $_.userPrincipalName
+            jobTitle          = $_.jobTitle
+            officeLocation    = $_.officeLocation
+            id                = $_.id
+            role              = "Owner"
+
+        }
+
+        $membersObject += New-Object PSObject -Property $owner
+
+    }
+
+    # Members #
+    ###########
+    $members = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$id/members"
+    $members.Value | ForEach-Object {
+
+        # Don't add if already an owner
+        if ($membersObject.id -notcontains $_.id) {
+
+            $member = @{
+
+                displayName       = $_.displayName
+                userPrincipalName = $_.userPrincipalName
+                jobTitle          = $_.jobTitle
+                officeLocation    = $_.officeLocation
+                id                = $_.id
+                role              = $_.UserType
+    
+            }
+    
+            $membersObject += New-Object PSObject -Property $member
+
+        }
+
+    }
+
+    return $membersObject
+
 }
 
 function GetChannelInformation {
@@ -5190,7 +5206,7 @@ function OKPrompt {
 
 }
 
-function checkIfOwner {
+function CheckIfOwner {
 
     param (
 
@@ -5234,7 +5250,7 @@ function checkIfOwner {
 
 }
 
-function checkIfMember {
+function CheckIfMember {
 
     param (
 
@@ -5312,9 +5328,15 @@ function TeamsReport {
 
             # More info from Graph
             $team = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$($_.id)" -silent
-            $members = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$($_.id)/members" -silent
-            $owners = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/groups/$($_.id)/owners" -silent
             $channels = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$($_.id)/channels" -silent
+
+            # Members
+            $members = GetTeamMembers -id $script:currentTeamId
+
+            # Member Totals
+            $totalMembers = ($members | Where-Object { $_.role -eq "Member" } | Measure-Object).Count    
+            $totalOwners = ($members | Where-Object { $_.role -eq "Owner" } | Measure-Object).Count
+            $totalGuests = ($members | Where-Object { $_.role -eq "Guest" } | Measure-Object).Count
 
             $teamsObject = @{
 
@@ -5357,8 +5379,9 @@ function TeamsReport {
 
                 # Totals
                 NumberChannels                    = (($channels).value).Count
-                NumberOwners                      = (($owners).value).Count
-                NumberMembers                     = (($members).value).Count
+                NumberOwners                      = $totalOwners
+                NumberMembers                     = $totalMembers
+                NumberGuests                      = $totalGuests
 
             }
 
