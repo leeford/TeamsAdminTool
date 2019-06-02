@@ -5331,7 +5331,7 @@ function TeamsReport {
             $channels = InvokeGraphAPICall -Method "GET" -Uri "https://graph.microsoft.com/beta/teams/$($_.id)/channels" -silent
 
             # Members
-            $members = GetTeamMembers -id $script:currentTeamId
+            $members = GetTeamMembers -id $_.id
 
             # Member Totals
             $totalMembers = ($members | Where-Object { $_.role -eq "Member" } | Measure-Object).Count    
